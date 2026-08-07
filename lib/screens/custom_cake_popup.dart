@@ -2,6 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 
+// Helper to map size codes to Spanish labels
+String _sizeLabel(String code) {
+  switch (code) {
+    case "S":
+      return "Pequeño";
+    case "M":
+      return "Mediano";
+    case "L":
+      return "Grande";
+    default:
+      return code;
+  }
+}
+
+
 class CustomCakePopup extends StatefulWidget {
   final Map<String, dynamic> torta;
 
@@ -17,6 +32,7 @@ class _CustomCakePopupState extends State<CustomCakePopup> {
   int _pisos = 1;
   final TextEditingController _porcionesController = TextEditingController();
   final TextEditingController _mensajeController = TextEditingController();
+  final TextEditingController _descripcionController = TextEditingController();
 
   String _colorSeleccionadoNombre = "Rosa pastel";
   final List<Map<String, dynamic>> _coloresDisponibles = [
@@ -28,7 +44,7 @@ class _CustomCakePopupState extends State<CustomCakePopup> {
     {"nombre": "Lila", "color": const Color(0xFFDDA0DD)},
   ];
 
-  final List<String> _tamanios = ["S", "M", "L"];
+  final List<String> _tamanios = ["S", "M", "L"]; // internal codes
   final List<String> _sabores = [
     "Chocolate", "Vainilla", "Fresa", "Maracuyá", "Oreo", "Manjar blanco", "Lúcuma"
   ];
@@ -43,6 +59,7 @@ class _CustomCakePopupState extends State<CustomCakePopup> {
   void dispose() {
     _porcionesController.dispose();
     _mensajeController.dispose();
+    _descripcionController.dispose();
     super.dispose();
   }
 
@@ -96,7 +113,7 @@ class _CustomCakePopupState extends State<CustomCakePopup> {
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
                     width: 70, height: 70, color: const Color(0xFFFFE4E1),
-                    child: const Icon(Icons.cake, color: Color(0xFFE91E63)),
+                    child: const Icon(Icons.cake, color: Color(0xFFF07070)),
                   ),
                 ),
               ),
@@ -146,7 +163,7 @@ class _CustomCakePopupState extends State<CustomCakePopup> {
                             child: Column(
                               children: [
                                 Text(
-                                  t,
+                                  _sizeLabel(t),
                                   style: TextStyle(
                                     color: isSelected ? Colors.white : const Color(0xFF5A4A42),
                                     fontSize: 14,
@@ -278,6 +295,14 @@ class _CustomCakePopupState extends State<CustomCakePopup> {
                     ),
                   ),
                   const SizedBox(height: 16),
+                  _sectionTitle("Descripción"),
+                  TextField(
+                    controller: _descripcionController,
+                    maxLines: 2,
+                    decoration: _inputDecoration("Descripción de la torta (Opcional)", Icons.description_outlined),
+                    style: const TextStyle(color: Color(0xFF5A4A42), fontSize: 13),
+                  ),
+                  const SizedBox(height: 16),
                   _sectionTitle("Mensaje especial"),
                   TextField(
                     controller: _mensajeController,
@@ -306,6 +331,7 @@ class _CustomCakePopupState extends State<CustomCakePopup> {
                   int.tryParse(_porcionesController.text) ?? 10,
                   _colorSeleccionadoNombre,
                   _mensajeController.text.isEmpty ? "Sin mensaje" : _mensajeController.text,
+                  _descripcionController.text,
                 );
                 Navigator.pop(context); // close modal
                 ScaffoldMessenger.of(context).showSnackBar(

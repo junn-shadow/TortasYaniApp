@@ -2,11 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../utils/constants.dart';
+import '../utils/catalog.dart';
 import '../providers/cart_provider.dart';
 import 'cart_screen.dart';
 import '../providers/favorites_provider.dart';
 import 'custom_cake_popup.dart';
+import '../services/products_api_service.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import '../providers/notifications_provider.dart';
+import 'notifications_screen.dart';
+
 class MyAppHomeScreen extends StatefulWidget {
   const MyAppHomeScreen({super.key});
 
@@ -16,153 +23,99 @@ class MyAppHomeScreen extends StatefulWidget {
 
 class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
   int selectedCategory = 0;
+  int _currentPromoIndex = 0;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = "";
 
   final List<String> categories = [
-    "All",
-    "Tortas Especiales",
-    "Cheesecake y Pyes",
-    "Tortas",
-    "Matrimoniales",
-    "Quinceañeros",
+    "Todos",
+    "Tortas Generales",
+    "De Matrimonio",
+    "De Quince Años",
+    "Exclusivas",
   ];
 
-  final List<Map<String, dynamic>> tortas = [
-    {
-      "nombre": "Torta de Chocolate",
-      "categoria": "Tortas Especiales",
-      "precio": 85.0,
-      "imagen": "https://res.cloudinary.com/ddfzttgyr/image/upload/v1774234559/torta_de_chocolate_wv8mi7.png",
-      "rating": 4.9,
-      "resenas": 124,
-      "badge": "Popular",
-      "descripcion": "Deliciosa torta de chocolate con capas de bizcocho húmedo y ganache.",
-      "ingredientes": ["Chocolate", "Harina", "Huevos", "Mantequilla", "Azúcar"],
-      "tamanios": ["S", "M", "L"],
-    },
-    {
-      "nombre": "Cheesecake de Maracuyá",
-      "categoria": "Cheesecake y Pyes",
-      "precio": 80.0,
-      "imagen": "https://res.cloudinary.com/ddfzttgyr/image/upload/v1774234883/Cheesecake_de_Maracuy%C3%A1_knhn3w.png",
-      "rating": 4.9,
-      "resenas": 110,
-      "badge": "Popular",
-      "descripcion": "Refrescante cheesecake con coulis de maracuyá tropical.",
-      "ingredientes": ["Maracuyá", "Queso crema", "Galletas", "Crema", "Azúcar"],
-      "tamanios": ["S", "M", "L"],
-    },
-    {
-      "nombre": "Torta de Zanahoria",
-      "categoria": "Tortas",
-      "precio": 65.0,
-      "imagen": "https://res.cloudinary.com/ddfzttgyr/image/upload/v1774234868/Torta_de_Zanahoriaa_ury5wh.png",
-      "rating": 4.7,
-      "resenas": 76,
-      "badge": "Favorito",
-      "descripcion": "Esponjosa torta de zanahoria con frosting de queso crema y nueces.",
-      "ingredientes": ["Zanahoria", "Harina", "Huevos", "Nueces", "Queso crema"],
-      "tamanios": ["S", "M", "L"],
-    },
-    {
-      "nombre": "Torta de Vainilla",
-      "categoria": "Tortas",
-      "precio": 60.0,
-      "imagen": "https://res.cloudinary.com/ddfzttgyr/image/upload/v1774234876/torta_de_vainilla_vgcfkf.png",
-      "rating": 4.6,
-      "resenas": 89,
-      "badge": "",
-      "descripcion": "Clásica torta de vainilla con crema suave y decoración elegante.",
-      "ingredientes": ["Vainilla", "Harina", "Huevos", "Mantequilla", "Leche"],
-      "tamanios": ["S", "M", "L"],
-    },
-    {
-      "nombre": "Torta Matrimonial",
-      "categoria": "Matrimoniales",
-      "precio": 250.0,
-      "imagen": "https://res.cloudinary.com/ddfzttgyr/image/upload/v1774234891/Torta_Matrimonial_qhxegx.png",
-      "rating": 5.0,
-      "resenas": 45,
-      "badge": "Premium",
-      "descripcion": "Elegante torta matrimonial de varios pisos decorada a medida.",
-      "ingredientes": ["Vainilla", "Fondant", "Crema", "Flores", "Perlas"],
-      "tamanios": ["M", "L", "XL"],
-    },
-    {
-      "nombre": "Torta de Quinceañera",
-      "categoria": "Quinceañeros",
-      "precio": 200.0,
-      "imagen": "https://res.cloudinary.com/ddfzttgyr/image/upload/v1774234897/Torta_de_Quincea%C3%B1era_evxzmp.png",
-      "rating": 4.8,
-      "resenas": 62,
-      "badge": "Especial",
-      "descripcion": "Torta especial para quinceañeras con decoración rosa y detalles dorados.",
-      "ingredientes": ["Vainilla", "Fondant rosa", "Crema", "Flores", "Brillantina"],
-      "tamanios": ["M", "L", "XL"],
-    },
-    {
-      "nombre": "Pie de Limón",
-      "categoria": "Cheesecake y Pyes",
-      "precio": 55.0,
-      "imagen": "https://res.cloudinary.com/ddfzttgyr/image/upload/v1774234905/Pie_de_Lim%C3%B3n_plhcyw.png",
-      "rating": 4.7,
-      "resenas": 83,
-      "badge": "",
-      "descripcion": "Clásico pie de limón con merengue tostado y base crocante.",
-      "ingredientes": ["Limón", "Huevos", "Azúcar", "Galletas", "Mantequilla"],
-      "tamanios": ["S", "M", "L"],
-    },
-    {
-      "nombre": "Red Velvet",
-      "categoria": "Tortas Especiales",
-      "precio": 90.0,
-      "imagen": "https://res.cloudinary.com/ddfzttgyr/image/upload/v1774234910/Red_Velvet_da5fqq.png",
-      "rating": 4.9,
-      "resenas": 137,
-      "badge": "Top",
-      "descripcion": "Irresistible red velvet con frosting de queso crema y color rojo intenso.",
-      "ingredientes": ["Cacao", "Colorante rojo", "Queso crema", "Harina", "Buttermilk"],
-      "tamanios": ["S", "M", "L"],
-    },
-    {
-      "nombre": "Tres Leches",
-      "categoria": "Tortas",
-      "precio": 70.0,
-      "imagen": "https://res.cloudinary.com/ddfzttgyr/image/upload/v1774234917/Tres_Leches_d8lm11.png",
-      "rating": 4.8,
-      "resenas": 91,
-      "badge": "Nuevo",
-      "descripcion": "Esponjoso bizcocho empapado en tres tipos de leche con crema chantilly.",
-      "ingredientes": ["Leche condensada", "Leche evaporada", "Crema", "Huevos", "Harina"],
-      "tamanios": ["S", "M", "L"],
-    },
-    {
-      "nombre": "Torta de Frutos del Bosque",
-      "categoria": "Tortas Especiales",
-      "precio": 95.0,
-      "imagen": "https://res.cloudinary.com/ddfzttgyr/image/upload/v1774234923/Torta_de_Frutos_del_Bosque_sfpmtk.png",
-      "rating": 4.8,
-      "resenas": 72,
-      "badge": "Nuevo",
-      "descripcion": "Exquisita torta con mix de frutos del bosque frescos y crema.",
-      "ingredientes": ["Frutos del bosque", "Crema", "Harina", "Huevos", "Azúcar"],
-      "tamanios": ["S", "M", "L"],
-    },
-  ];
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProducts();
+  }
+
+  Future<void> _fetchProducts() async {
+    try {
+      final apiProducts = await ProductsApiService.fetchProducts();
+      if (apiProducts.isNotEmpty) {
+        setState(() {
+          TortasCatalog.tortas = apiProducts;
+        });
+      }
+    } catch (e) {
+      debugPrint("Error al cargar productos del catálogo 🚨: $e");
+    }
+  }
 
   List<Map<String, dynamic>> get tortasFiltradas {
-    if (selectedCategory == 0) return tortas;
-    return tortas.where((t) => t["categoria"] == categories[selectedCategory]).toList();
+    List<Map<String, dynamic>> result = TortasCatalog.tortas;
+    if (selectedCategory != 0) {
+      final categoryName = categories[selectedCategory];
+      if (categoryName == "Tortas Generales") {
+        result = result
+            .where((t) => t["categoria"] == "Tortas" || t["categoria"] == "Cheesecake y Pyes")
+            .toList();
+      } else if (categoryName == "De Matrimonio") {
+        result = result
+            .where((t) => t["categoria"] == "Matrimoniales" || t["categoria"] == "Matrimonio")
+            .toList();
+      } else if (categoryName == "De Quince Años") {
+        result = result
+            .where((t) => t["categoria"] == "Quinceañeros" || t["categoria"] == "Quince Años")
+            .toList();
+      } else if (categoryName == "Exclusivas") {
+        result = result
+            .where((t) => t["categoria"] == "Tortas Especiales" || t["categoria"] == "Exclusivas")
+            .toList();
+      }
+    }
+    if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase().trim();
+      result = result
+          .where((t) => (t["nombre"] as String).toLowerCase().contains(query))
+          .toList();
+    }
+    return result;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 10, 17, 41),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Column(
+      backgroundColor: const Color(0xFFFFFDF8),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFFFF0F5), // Blush rosado
+              Color(0xFFFFFDF8), // Crema
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: RefreshIndicator(
+            onRefresh: _fetchProducts,
+            color: const Color(0xFFF07070),
+            backgroundColor: Colors.white,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 18),
+                child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 15),
@@ -174,28 +127,55 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
                 const SizedBox(height: 25),
                 sectionTitle("Nuestras Tortas 🎂"),
                 const SizedBox(height: 15),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 0.75,
-                  ),
-                  itemCount: tortasFiltradas.length,
-                  itemBuilder: (context, index) {
-                    return tortaCard(tortasFiltradas[index])
-                        .animate()
-                        .fade(duration: 400.ms, delay: (50 * index).ms)
-                        .slideY(begin: 0.1, duration: 400.ms, delay: (50 * index).ms);
-                  },
-                ),
+                tortasFiltradas.isEmpty
+                    ? Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 40),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "🎂",
+                                style: TextStyle(fontSize: 50),
+                              ),
+                              const SizedBox(height: 15),
+                              Text(
+                                "No se encontraron tortas para esta búsqueda",
+                                style: TextStyle(
+                                  color: Color(0xFF8D7A70),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.75,
+                        ),
+                        itemCount: tortasFiltradas.length,
+                        itemBuilder: (context, index) {
+                          return tortaCard(tortasFiltradas[index])
+                              .animate()
+                              .fade(duration: 400.ms, delay: (50 * index).ms)
+                              .slideY(begin: 0.1, duration: 400.ms, delay: (50 * index).ms);
+                        },
+                      ),
                 const SizedBox(height: 20),
               ],
             ),
           ),
         ),
+      ),
+      ),
       ),
     );
   }
@@ -204,20 +184,24 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Column(
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               "Bienvenida 💗",
-              style: TextStyle(fontSize: 16, color: Color(0xFF9E9E9E)),
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF8D7A70),
+              ),
             ),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             Text(
               "Tortas Yani",
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFFE91E63),
+                color: const Color(0xFFF07070),
               ),
             ),
           ],
@@ -238,7 +222,7 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
                     children: [
                       const CircleAvatar(
                         radius: 25,
-                        backgroundColor: Color(0xFFE91E63),
+                        backgroundColor: Color(0xFFF07070),
                         child: Icon(Icons.shopping_cart_outlined, color: Colors.white, size: 22),
                       ),
                       if (cart.totalItems > 0)
@@ -257,7 +241,7 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
                                 "${cart.totalItems}",
                                 style: const TextStyle(
                                   fontSize: 10,
-                                  color: Color(0xFFE91E63),
+                                  color: Color(0xFFF07070),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -271,21 +255,60 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
             ),
             const SizedBox(width: 10),
             // NOTIFICACIONES
-            Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.pink.withOpacity(0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: const CircleAvatar(
-                radius: 25,
-                backgroundColor: Color(0xFFFFF3B0),
-                child: Icon(Iconsax.notification_bing, color: Colors.amber, size: 26),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+                );
+              },
+              child: Consumer<NotificationsProvider>(
+                builder: (context, notificationsProvider, child) {
+                  return Stack(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFF07070).withOpacity(0.2),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: const CircleAvatar(
+                          radius: 25,
+                          backgroundColor: Color(0xFFFFF3B0),
+                          child: Icon(Iconsax.notification_bing, color: Colors.amber, size: 26),
+                        ),
+                      ),
+                      if (notificationsProvider.unreadCount > 0)
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            width: 18,
+                            height: 18,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFF07070),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: Text(
+                                "${notificationsProvider.unreadCount}",
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
               ),
             ),
           ],
@@ -298,11 +321,29 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 22),
       child: TextField(
+        controller: _searchController,
+        onChanged: (value) {
+          setState(() {
+            _searchQuery = value;
+          });
+        },
+        style: const TextStyle(color: Colors.black87),
         decoration: InputDecoration(
           filled: true,
           fillColor: AppColors.whiteColor,
           hintText: "Buscar tortas...",
           prefixIcon: const Icon(Iconsax.search_normal, color: Color.fromARGB(255, 8, 25, 34)),
+          suffixIcon: _searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear_rounded, color: Colors.grey),
+                  onPressed: () {
+                    _searchController.clear();
+                    setState(() {
+                      _searchQuery = "";
+                    });
+                  },
+                )
+              : null,
           contentPadding: const EdgeInsets.symmetric(vertical: 15),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
@@ -314,46 +355,182 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
   }
 
   Widget promoCard() {
-    return Container(
-      width: double.infinity,
-      height: 220,
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: Image.asset("assets/images/torta.png", fit: BoxFit.cover),
-            ),
-            Positioned.fill(
-              child: Container(color: Colors.black.withOpacity(0.35)),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    " Yani 🍰\nEndulzando tus momentos",
-                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 15),
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFFE91E63),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    ),
-                    child: const Text("Explorar"),
-                  ),
-                ],
+    final List<Map<String, String>> slides = [
+      {
+        "image": "assets/images/cake1.png",
+        "title": "¡Especial de la Casa! 🎂",
+        "subtitle": "Tortas personalizadas con el mejor sabor",
+      },
+      {
+        "image": "assets/images/cake2.png",
+        "title": "Delicia de Fresa 🍓",
+        "subtitle": "Frescura y elegancia en cada bocado",
+      },
+      {
+        "image": "assets/images/cake3.png",
+        "title": "Momentos Dorados ✨",
+        "subtitle": "Tortas exclusivas para bodas y eventos",
+      },
+    ];
+
+    return Column(
+      children: [
+        CarouselSlider.builder(
+          itemCount: slides.length,
+          options: CarouselOptions(
+            height: 220,
+            viewportFraction: 1.0,
+            autoPlay: true,
+            autoPlayInterval: const Duration(seconds: 4),
+            enlargeCenterPage: false,
+            onPageChanged: (index, reason) {
+              setState(() {
+                _currentPromoIndex = index;
+              });
+            },
+          ),
+          itemBuilder: (context, index, realIdx) {
+            final slide = slides[index];
+            return Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
               ),
-            ),
-          ],
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: Image.asset(
+                        slide["image"]!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: const Color(0xFF161F3D),
+                            child: const Center(
+                              child: Text(
+                                "🍰 Yani",
+                                style: TextStyle(color: Colors.white, fontSize: 24),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.black.withOpacity(0.2),
+                              Colors.black.withOpacity(0.7),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            slide["title"]!,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              shadows: [
+                                Shadow(
+                                  blurRadius: 8,
+                                  color: Colors.black45,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            slide["subtitle"]!,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.85),
+                              fontSize: 14,
+                              shadows: const [
+                                Shadow(
+                                  blurRadius: 8,
+                                  color: Colors.black45,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  if (index == 0) {
+                                    selectedCategory = categories.indexOf("Exclusivas");
+                                  } else if (index == 1) {
+                                    selectedCategory = categories.indexOf("Tortas Generales");
+                                    _searchController.text = "Fresa";
+                                    _searchQuery = "Fresa";
+                                  } else if (index == 2) {
+                                    selectedCategory = categories.indexOf("De Matrimonio");
+                                  }
+                                });
+                              },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFF07070),
+                              foregroundColor: Colors.white,
+                              elevation: 3,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  "Explorar",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(width: 5),
+                                Icon(Icons.arrow_forward_rounded, size: 16),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
-      ),
+        const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: slides.asMap().entries.map((entry) {
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: _currentPromoIndex == entry.key ? 18.0 : 8.0,
+              height: 8.0,
+              margin: const EdgeInsets.symmetric(horizontal: 4.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4.0),
+                color: _currentPromoIndex == entry.key
+                    ? const Color(0xFFF07070)
+                    : const Color(0xFF9E9E9E).withOpacity(0.4),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 
@@ -361,9 +538,13 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "Categorías",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF5A4A42),
+          ),
         ),
         const SizedBox(height: 15),
         SizedBox(
@@ -375,20 +556,39 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
               final bool isSelected = selectedCategory == index;
               return GestureDetector(
                 onTap: () => setState(() => selectedCategory = index),
-                child: Container(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
                   margin: const EdgeInsets.only(right: 10),
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppColors.primaryColor : AppColors.whiteColor,
+                    color: isSelected ? const Color(0xFFF07070) : Colors.white,
                     borderRadius: BorderRadius.circular(30),
-                    border: Border.all(color: AppColors.primaryColor),
+                    border: Border.all(
+                      color: isSelected ? const Color(0xFFF07070) : const Color(0xFFE5D5C5),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      if (isSelected)
+                        BoxShadow(
+                          color: const Color(0xFFF07070).withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        )
+                      else
+                        BoxShadow(
+                          color: const Color(0xFF5A4A42).withOpacity(0.03),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                    ],
                   ),
                   child: Center(
                     child: Text(
                       categories[index],
-                      style: TextStyle(
-                        color: isSelected ? Colors.white : AppColors.primaryColor,
-                        fontWeight: FontWeight.w500,
+                      style: GoogleFonts.poppins(
+                        color: isSelected ? Colors.white : const Color(0xFF8D7A70),
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                        fontSize: 13,
                       ),
                     ),
                   ),
@@ -404,7 +604,11 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
   Widget sectionTitle(String title) {
     return Text(
       title,
-      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
+      style: GoogleFonts.poppins(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        color: const Color(0xFF5A4A42),
+      ),
     );
   }
 
@@ -414,156 +618,163 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFE91E63).withOpacity(0.10),
-              blurRadius: 20,
+              color: const Color(0xFF5A4A42).withOpacity(0.06),
+              blurRadius: 18,
               offset: const Offset(0, 8),
-            ),
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-              child: Stack(
-                children: [
-                  Image.network(
-                    torta["imagen"],
-                    height: 140,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      height: 140,
-                      color: const Color(0xFF1A2340),
-                      child: const Center(child: Text("🎂", style: TextStyle(fontSize: 40))),
-                    ),
-                  ),
-                  if (torta["badge"] != "")
-                    Positioned(
-                      top: 8,
-                      left: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE91E63),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          torta["badge"],
-                          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500),
-                        ),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.network(
+                      torta["imagen"],
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          color: const Color(0xFFFFF0F5),
+                        )
+                            .animate(onPlay: (controller) => controller.repeat())
+                            .shimmer(duration: 1200.ms, color: Colors.white.withOpacity(0.4));
+                      },
+                      errorBuilder: (_, __, ___) => Container(
+                        color: const Color(0xFFFFF0F5),
+                        child: const Center(child: Text("🎂", style: TextStyle(fontSize: 40))),
                       ),
                     ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Consumer<FavoritesProvider>(
-                      builder: (context, favorites, child) {
-                        final esFavorito = favorites.isFavorite(torta["nombre"]);
-                        return GestureDetector(
-                          onTap: () => favorites.toggleFavorite(torta),
-                          child: Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.9),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              esFavorito ? Icons.favorite : Icons.favorite_border,
-                              color: const Color(0xFFE91E63),
-                              size: 17,
+                    if (torta["badge"] != "")
+                      Positioned(
+                        top: 8,
+                        left: 8,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF07070),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            torta["badge"],
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        );
-                      },
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 8,
-                    left: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.55),
-                        borderRadius: BorderRadius.circular(20),
+                        ),
                       ),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.access_time, color: Colors.white, size: 11),
-                          SizedBox(width: 3),
-                          Text("30-45 min", style: TextStyle(color: Colors.white, fontSize: 10)),
-                        ],
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Consumer<FavoritesProvider>(
+                        builder: (context, favorites, child) {
+                          final esFavorito = favorites.isFavorite(torta["nombre"]);
+                          return GestureDetector(
+                            onTap: () => favorites.toggleFavorite(torta),
+                            child: Container(
+                              width: 30,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.9),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                esFavorito ? Icons.favorite : Icons.favorite_border,
+                                color: const Color(0xFFF07070),
+                                size: 16,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     torta["nombre"],
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black87),
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF5A4A42),
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
                     torta["descripcion"],
-                    style: const TextStyle(fontSize: 10, color: Colors.grey),
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      color: const Color(0xFF8D7A70),
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(Icons.star, color: Color(0xFFE91E63), size: 13),
-                      const SizedBox(width: 2),
-                      Text("${torta["rating"]}", style: const TextStyle(fontSize: 11, color: Colors.grey)),
-                      const SizedBox(width: 4),
-                      Text("(${torta["resenas"]})", style: const TextStyle(fontSize: 10, color: Colors.grey)),
-                    ],
-                  ),
                   const SizedBox(height: 6),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: LinearProgressIndicator(
-                      value: torta["rating"] / 5.0,
-                      backgroundColor: Colors.grey.shade200,
-                      color: const Color(0xFFE91E63),
-                      minHeight: 4,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "S/ ${torta["precio"].toStringAsFixed(0)}",
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFFE91E63)),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.star_rounded, color: Colors.amber, size: 14),
+                              const SizedBox(width: 2),
+                              Text(
+                                "${torta["rating"]}",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFF5A4A42),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            "S/ ${torta["precio"].toStringAsFixed(0)}",
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFFF07070),
+                            ),
+                          ),
+                        ],
                       ),
                       GestureDetector(
                         onTap: () => mostrarPopupPersonalizacion(context, torta),
                         child: Container(
-                          width: 28,
-                          height: 28,
+                          width: 32,
+                          height: 32,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE91E63),
-                            borderRadius: BorderRadius.circular(8),
+                            color: const Color(0xFFF07070),
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFF07070).withOpacity(0.3),
+                                blurRadius: 6,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
                           ),
-                          child: const Icon(Icons.add, color: Colors.white, size: 18),
+                          child: const Icon(Icons.add_rounded, color: Colors.white, size: 20),
                         ),
                       ),
                     ],

@@ -92,11 +92,11 @@ class _MapScreenState extends State<MapScreen> {
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE91E63),
+                              color: const Color(0xFFF07070),
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFFE91E63).withOpacity(0.4),
+                                  color: const Color(0xFFF07070).withOpacity(0.4),
                                   blurRadius: 10,
                                   offset: const Offset(0, 3),
                                 ),
@@ -121,7 +121,7 @@ class _MapScreenState extends State<MapScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CircularProgressIndicator(color: Color(0xFFE91E63)),
+                    CircularProgressIndicator(color: Color(0xFFF07070)),
                     SizedBox(height: 16),
                     Text(
                       "Obteniendo tu ubicación...",
@@ -145,7 +145,7 @@ class _MapScreenState extends State<MapScreen> {
               ),
               child: const Row(
                 children: [
-                  Icon(Icons.touch_app, color: Color(0xFFE91E63), size: 20),
+                  Icon(Icons.touch_app, color: Color(0xFFF07070), size: 20),
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -177,7 +177,7 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                   ],
                 ),
-                child: const Icon(Icons.my_location, color: Color(0xFFE91E63), size: 24),
+                child: const Icon(Icons.my_location, color: Color(0xFFF07070), size: 24),
               ),
             ),
           ),
@@ -199,7 +199,7 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.location_on, color: Color(0xFFE91E63), size: 18),
+                        const Icon(Icons.location_on, color: Color(0xFFF07070), size: 18),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -228,7 +228,7 @@ class _MapScreenState extends State<MapScreen> {
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFE91E63),
+                      backgroundColor: const Color(0xFFF07070),
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                       elevation: 0,

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:provider/provider.dart';
 import 'login_screen.dart';
 import 'edit_profile_screen.dart';
 import '../services/session_service.dart';
+import '../providers/orders_provider.dart';
+import '../utils/constants.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -15,6 +19,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String email = '';
   String telefono = '';
   String direccion = '';
+  String fotoPerfil = '';
   bool _isLoading = true;
 
   @override
@@ -30,6 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       email = user['email'] ?? '';
       telefono = user['telefono'] ?? '';
       direccion = user['direccion'] ?? '';
+      fotoPerfil = user['fotoPerfil'] ?? '';
       _isLoading = false;
     });
   }
@@ -37,16 +43,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
-        backgroundColor: Color.fromARGB(255, 10, 17, 41),
-        body: Center(
-          child: CircularProgressIndicator(color: Color(0xFFE91E63)),
+      return Scaffold(
+        backgroundColor: AppColors.backgroundColor,
+        body: const Center(
+          child: CircularProgressIndicator(color: Color(0xFFF07070)),
         ),
       );
     }
 
+    final ordersProvider = Provider.of<OrdersProvider>(context);
+    final userOrders = ordersProvider.orders;
+
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 10, 17, 41),
+      backgroundColor: AppColors.backgroundColor,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -58,8 +67,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0xFF1A1035),
-                    Color(0xFFE91E63),
+                    Color(0xFFFFF0F5), // Blush rosado
+                    Color(0xFFFFFDF8), // Crema
                   ],
                 ),
                 borderRadius: BorderRadius.only(
@@ -81,12 +90,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(color: Colors.white, width: 3),
-                              color: Colors.white.withOpacity(0.2),
-                            ),
-                            child: const Icon(
-                              Icons.person,
                               color: Colors.white,
-                              size: 55,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: ClipOval(
+                              child: fotoPerfil.isNotEmpty
+                                  ? (fotoPerfil.startsWith('http')
+                                      ? Image.network(
+                                          fotoPerfil,
+                                          fit: BoxFit.cover,
+                                          width: 100,
+                                          height: 100,
+                                        )
+                                      : Image.memory(
+                                          base64Decode(fotoPerfil),
+                                          fit: BoxFit.cover,
+                                          width: 100,
+                                          height: 100,
+                                        ))
+                                  : const Icon(
+                                      Icons.person,
+                                      color: Colors.black26,
+                                      size: 55,
+                                    ),
                             ),
                           ),
                           Positioned(
@@ -95,14 +127,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: Container(
                               width: 30,
                               height: 30,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF07070),
                                 shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 2),
                               ),
                               child: const Icon(
                                 Icons.camera_alt,
-                                color: Color(0xFFE91E63),
-                                size: 16,
+                                color: Colors.white,
+                                size: 14,
                               ),
                             ),
                           ),
@@ -114,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: Colors.black87,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -122,7 +155,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         email,
                         style: const TextStyle(
                           fontSize: 14,
-                          color: Colors.white70,
+                          color: Colors.black54,
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -142,19 +175,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 8),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.white54),
+                            border: Border.all(color: const Color(0xFFF07070).withOpacity(0.3)),
                           ),
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.edit, color: Colors.white, size: 16),
+                              Icon(Icons.edit, color: Color(0xFFF07070), size: 16),
                               SizedBox(width: 6),
                               Text(
                                 "Editar perfil",
                                 style: TextStyle(
-                                    color: Colors.white, fontSize: 13),
+                                    color: Color(0xFFF07070), fontSize: 13, fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
@@ -186,9 +219,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             _sectionTitle("Historial de pedidos"),
 
-            _pedidoCard("Torta de Chocolate", "S/ 85", "Entregado", "15 Mar 2026"),
-            _pedidoCard("Cheesecake de Fresa", "S/ 75", "Entregado", "10 Mar 2026"),
-            _pedidoCard("Red Velvet", "S/ 90", "En camino", "21 Mar 2026"),
+            if (userOrders.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: Text(
+                  "Aún no tienes pedidos",
+                  style: TextStyle(color: Colors.black54),
+                ),
+              )
+            else
+              ...userOrders.map((order) {
+                // Get the first item name for quick display
+                final items = order['items'] as List<dynamic>? ?? [];
+                String firstItemName = items.isNotEmpty ? items.first['nombre'] : "Pedido especial";
+                if (items.length > 1) {
+                  firstItemName += " y más...";
+                }
+                
+                return _pedidoCard(
+                  firstItemName, 
+                  "S/ ${order['total']?.toString() ?? '0'}", 
+                  order['estado'] ?? "Pendiente", 
+                  order['fechaStr'] ?? "Hoy",
+                );
+              }),
 
             const SizedBox(height: 20),
 
@@ -200,6 +254,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: ElevatedButton.icon(
                   onPressed: () async {
                     await SessionService.clearUser();
+                    if (!mounted) return;
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -209,11 +264,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   icon: const Icon(Icons.logout),
                   label: const Text(
                     "Cerrar sesión",
-                    style: TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE91E63),
+                    backgroundColor: const Color(0xFFF07070),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -241,7 +295,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Color(0xFFE91E63),
+            color: Color(0xFFF07070),
           ),
         ),
       ),
@@ -252,8 +306,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2340),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(children: items),
     );
@@ -264,18 +325,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFFE91E63), size: 22),
+          Icon(icon, color: const Color(0xFFF07070), size: 22),
           const SizedBox(width: 14),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 label,
-                style: const TextStyle(fontSize: 12, color: Colors.white54),
+                style: const TextStyle(fontSize: 12, color: Colors.black54),
               ),
               Text(
                 value,
-                style: const TextStyle(fontSize: 15, color: Colors.white),
+                style: const TextStyle(fontSize: 15, color: Colors.black87),
               ),
             ],
           ),
@@ -291,8 +352,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2340),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -300,7 +368,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             width: 45,
             height: 45,
             decoration: BoxDecoration(
-              color: const Color(0xFFE91E63).withOpacity(0.15),
+              color: const Color(0xFFF07070).withOpacity(0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Center(
@@ -317,13 +385,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: Colors.black87,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   fecha,
-                  style: const TextStyle(fontSize: 12, color: Colors.white54),
+                  style: const TextStyle(fontSize: 12, color: Colors.black54),
                 ),
               ],
             ),
@@ -336,13 +406,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFFE91E63),
+                  color: Color(0xFFF07070),
                 ),
               ),
               const SizedBox(height: 4),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: entregado
                       ? Colors.green.withOpacity(0.2)
@@ -353,7 +422,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   estado,
                   style: TextStyle(
                     fontSize: 11,
-                    color: entregado ? Colors.green : Colors.orange,
+                    color: entregado ? Colors.green.shade700 : Colors.orange.shade700,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

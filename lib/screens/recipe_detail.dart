@@ -8,7 +8,7 @@ class RecipeDetail extends StatefulWidget {
   const RecipeDetail({super.key, required this.recipesData});
 
   @override
-  _RecipeDetailState createState() => _RecipeDetailState();
+  State<RecipeDetail> createState() => _RecipeDetailState();
 }
 
 class _RecipeDetailState extends State<RecipeDetail> with SingleTickerProviderStateMixin {
@@ -21,7 +21,7 @@ class _RecipeDetailState extends State<RecipeDetail> with SingleTickerProviderSt
     super.initState();
 
     _controller = AnimationController(vsync: this,
-      duration:  Duration(milliseconds: 300)
+      duration:  const Duration(milliseconds: 300)
     );
 
     _scaleAnimation = Tween<double>(begin: 1.0, end: 1.5).animate(
@@ -39,7 +39,6 @@ class _RecipeDetailState extends State<RecipeDetail> with SingleTickerProviderSt
     isFavorite = Provider.of<RecipesProvider>(context, listen: false)
         .favoriteRecipe
         .contains(widget.recipesData);
-    ;
   }
 
   @override
@@ -48,12 +47,13 @@ class _RecipeDetailState extends State<RecipeDetail> with SingleTickerProviderSt
     super.dispose();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
           widget.recipesData.name,
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.orange,
         leading: IconButton(
@@ -80,38 +80,38 @@ class _RecipeDetailState extends State<RecipeDetail> with SingleTickerProviderSt
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.all(18),
+        padding: const EdgeInsets.all(18),
         child: Column(
           children: [
             Image.network(widget.recipesData.imageLink),
-            SizedBox(
+            const SizedBox(
               height: 8,
             ),
             Text(
               widget.recipesData.name,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.orange,
                 fontFamily: 'Quicksand',
                 fontWeight: FontWeight.w700,
                 fontSize: 18,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 8,
             ),
             Text("by ${widget.recipesData.author}",
-                style: TextStyle(
+                style: const TextStyle(
                   fontFamily: 'Quicksand',
                   fontWeight: FontWeight.w700,
                   fontSize: 16,
                 )),
-            SizedBox(
+            const SizedBox(
               height: 8,
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Recipes steps:',
                   style: TextStyle(
                     fontFamily: 'Quicksand',

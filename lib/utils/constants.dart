@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 /// 🎨 COLORES DE LA APLICACIÓN
 /// ===============================
 class AppColors {
-  static const Color backgroundColor = Color(0xFFEFF1F7);
-  static const Color primaryColor = Color(0xFF056A9F);
-  static const Color bannerColor = Color(0xFF579F8C);
-  static const Color secondaryColor = Color(0xFFE3F2FD); 
-  static const Color textColor = Color(0xFF000000);
+  static const Color backgroundColor = Color(0xFFFFFDF8);
+  static const Color primaryColor = Color(0xFFF07070);
+  static const Color bannerColor = Color(0xFFF07070);
+  static const Color secondaryColor = Color(0xFFEFF1F7);
+  static const Color textColor = Color(0xFF5A4A42);
   static const Color whiteColor = Color(0xFFFFFFFF);
   static const Color greyColor = Color(0xFF9E9E9E);
 }

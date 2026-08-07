@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'login_screen.dart';
+import 'dart:ui'; // for glassmorphism blur
+import 'package:google_fonts/google_fonts.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -22,7 +24,6 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<Offset> _textSlide;
   late Animation<double> _loaderFade;
   late Animation<double> _floatAnim;
-  late Animation<double> _glowAnim;
 
   @override
   void initState() {
@@ -56,13 +57,6 @@ class _SplashScreenState extends State<SplashScreen>
       CurvedAnimation(
         parent: _logoController,
         curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
-      ),
-    );
-
-    _glowAnim = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(
-        parent: _logoController,
-        curve: const Interval(0.5, 1.0, curve: Curves.easeOut),
       ),
     );
 
@@ -133,6 +127,20 @@ class _SplashScreenState extends State<SplashScreen>
           ),
         ),
         child: Stack(
+          children: [
+            // Glassmorphism overlay
+            Positioned.fill(
+              child: ClipRRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                  child: Container(
+                    color: Colors.white.withOpacity(0.2),
+                  ),
+                ),
+              ),
+            ),
+            // Original content
+            Stack(
           alignment: Alignment.center,
           children: [
             // ── Círculos decorativos de fondo ──
@@ -140,22 +148,22 @@ class _SplashScreenState extends State<SplashScreen>
                 top: -60,
                 left: -60,
                 size: 220,
-                color: const Color(0xFFFFD6E7).withOpacity(0.5)),
+                color: const Color(0xFFFFD6E7).withValues(alpha: 0.5)),
             _buildBgCircle(
                 bottom: -80,
                 right: -80,
                 size: 280,
-                color: const Color(0xFFFFCCE0).withOpacity(0.4)),
+                color: const Color(0xFFFFCCE0).withValues(alpha: 0.4)),
             _buildBgCircle(
                 top: 100,
                 right: -40,
                 size: 140,
-                color: const Color(0xFFFFC8A0).withOpacity(0.3)),
+                color: const Color(0xFFFFC8A0).withValues(alpha: 0.3)),
             _buildBgCircle(
                 bottom: 160,
                 left: -30,
                 size: 100,
-                color: const Color(0xFFFFB5C8).withOpacity(0.35)),
+                color: const Color(0xFFFFB5C8).withValues(alpha: 0.35)),
 
             // ── Partículas decorativas flotantes ──
             AnimatedBuilder(
@@ -195,14 +203,14 @@ class _SplashScreenState extends State<SplashScreen>
                       left: 20,
                       offset: _floatAnim.value,
                       icon: Icons.circle,
-                      color: const Color(0xFFF9C0D0).withOpacity(0.6),
+                      color: const Color(0xFFF9C0D0).withValues(alpha: 0.6),
                       size: 8),
                   _buildParticle(
                       top: 250,
                       right: 25,
                       offset: -_floatAnim.value * 0.5,
                       icon: Icons.circle,
-                      color: const Color(0xFFFFD4A0).withOpacity(0.6),
+                      color: const Color(0xFFFFD4A0).withValues(alpha: 0.6),
                       size: 10),
                 ],
               ),
@@ -239,12 +247,12 @@ class _SplashScreenState extends State<SplashScreen>
                     opacity: _textFade,
                     child: Column(
                       children: [
-                        const Text(
+                        Text(
                           "Tortas Yani",
-                          style: TextStyle(
+                          style: GoogleFonts.inter(
                             fontSize: 38,
                             fontWeight: FontWeight.w800,
-                            color: Color(0xFF7A3A52),
+                            color: const Color(0xFF7A3A52),
                             letterSpacing: 1.2,
                             height: 1.1,
                           ),
@@ -267,11 +275,11 @@ class _SplashScreenState extends State<SplashScreen>
                               ),
                             ),
                             const SizedBox(width: 10),
-                            const Text(
+                            Text(
                               "Endulzando tus momentos",
-                              style: TextStyle(
+                              style: GoogleFonts.inter(
                                 fontSize: 14,
-                                color: Color(0xFFB07888),
+                                color: const Color(0xFFB07888),
                                 letterSpacing: 0.6,
                                 fontWeight: FontWeight.w400,
                               ),
@@ -310,7 +318,7 @@ class _SplashScreenState extends State<SplashScreen>
                         child: CircularProgressIndicator(
                           strokeWidth: 2.5,
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            const Color(0xFFE88EA0).withOpacity(0.8),
+                            const Color(0xFFE88EA0).withValues(alpha: 0.8),
                           ),
                         ),
                       ),
@@ -319,7 +327,7 @@ class _SplashScreenState extends State<SplashScreen>
                         "Preparando algo especial...",
                         style: TextStyle(
                           fontSize: 12,
-                          color: const Color(0xFFB07888).withOpacity(0.7),
+                          color: const Color(0xFFB07888).withValues(alpha: 0.7),
                           letterSpacing: 0.5,
                         ),
                       ),
@@ -330,49 +338,18 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           ],
         ),
-      ),
-    );
-  }
+      ],
+    ),
+  ),
+);
+}
 
   Widget _buildLogo() {
-    return AnimatedBuilder(
-      animation: _glowAnim,
-      builder: (_, __) {
-        return Container(
-          width: 150,
-          height: 150,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color:
-                    const Color(0xFFF7A0B8).withOpacity(0.3 * _glowAnim.value),
-                blurRadius: 40,
-                spreadRadius: 10,
-              ),
-              BoxShadow(
-                color:
-                    const Color(0xFFFFD4A0).withOpacity(0.2 * _glowAnim.value),
-                blurRadius: 60,
-                spreadRadius: 20,
-              ),
-              BoxShadow(
-                color: const Color(0xFFFFB5C8).withOpacity(0.15),
-                blurRadius: 15,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(22),
-            child: CustomPaint(
-              painter: _CakePainter(),
-              size: const Size(106, 106),
-            ),
-          ),
-        );
-      },
+    // Display the generated splash icon asset
+    return Image.asset(
+      'assets/images/splash_icon.png',
+      width: 150,
+      height: 150,
     );
   }
 
@@ -418,190 +395,4 @@ class _SplashScreenState extends State<SplashScreen>
       child: Icon(icon, color: color, size: size),
     );
   }
-}
-
-class _CakePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-
-    // === Base / plato ===
-    final platePaint = Paint()
-      ..color = const Color(0xFFF5D5C0)
-      ..style = PaintingStyle.fill;
-    final plateRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(w * 0.05, h * 0.82, w * 0.90, h * 0.12),
-      const Radius.circular(6),
-    );
-    canvas.drawRRect(plateRect, platePaint);
-
-    // === Cuerpo de la torta (base) ===
-    final bodyPaint = Paint()
-      ..color = const Color(0xFFFFCCDD)
-      ..style = PaintingStyle.fill;
-    final bodyRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(w * 0.10, h * 0.55, w * 0.80, h * 0.30),
-      const Radius.circular(8),
-    );
-    canvas.drawRRect(bodyRect, bodyPaint);
-
-    // === Franja de crema (cuerpo) ===
-    final creamBodyPaint = Paint()
-      ..color = Colors.white.withOpacity(0.8)
-      ..style = PaintingStyle.fill;
-    canvas.drawRect(
-      Rect.fromLTWH(w * 0.10, h * 0.65, w * 0.80, h * 0.06),
-      creamBodyPaint,
-    );
-
-    // === Cuerpo segundo piso ===
-    final tier2Paint = Paint()
-      ..color = const Color(0xFFFDB8CE)
-      ..style = PaintingStyle.fill;
-    final tier2Rect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(w * 0.20, h * 0.30, w * 0.60, h * 0.27),
-      const Radius.circular(7),
-    );
-    canvas.drawRRect(tier2Rect, tier2Paint);
-
-    // === Franja crema piso 2 ===
-    canvas.drawRect(
-      Rect.fromLTWH(w * 0.20, h * 0.40, w * 0.60, h * 0.05),
-      creamBodyPaint,
-    );
-
-    // === Chantilly ondulado (top del piso 1) ===
-    _drawWavyFrosting(
-        canvas, w * 0.10, h * 0.55, w * 0.80, h, const Color(0xFFFFF0F5));
-
-    // === Chantilly ondulado (top del piso 2) ===
-    _drawWavyFrosting(
-        canvas, w * 0.20, h * 0.30, w * 0.60, h, const Color(0xFFFFF5F8));
-
-    // === Vela central ===
-    final candlePaint = Paint()
-      ..color = const Color(0xFFFFAED0)
-      ..style = PaintingStyle.fill;
-    final candleRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(w * 0.455, h * 0.13, w * 0.09, h * 0.18),
-      const Radius.circular(4),
-    );
-    canvas.drawRRect(candleRect, candlePaint);
-
-    // Rayas de la vela
-    final stripePaint = Paint()
-      ..color = Colors.white.withOpacity(0.5)
-      ..strokeWidth = 2.5
-      ..style = PaintingStyle.stroke;
-    canvas.drawLine(
-        Offset(w * 0.455, h * 0.17), Offset(w * 0.545, h * 0.17), stripePaint);
-    canvas.drawLine(
-        Offset(w * 0.455, h * 0.22), Offset(w * 0.545, h * 0.22), stripePaint);
-    canvas.drawLine(
-        Offset(w * 0.455, h * 0.27), Offset(w * 0.545, h * 0.27), stripePaint);
-
-    // === Llama de la vela ===
-    final flamePath = Path();
-    final fx = w * 0.50;
-    final fy = h * 0.13;
-    flamePath.moveTo(fx, fy - h * 0.01);
-    flamePath.cubicTo(
-      fx + w * 0.04,
-      fy - h * 0.07,
-      fx + w * 0.06,
-      fy - h * 0.10,
-      fx,
-      fy - h * 0.14,
-    );
-    flamePath.cubicTo(
-      fx - w * 0.06,
-      fy - h * 0.10,
-      fx - w * 0.04,
-      fy - h * 0.07,
-      fx,
-      fy - h * 0.01,
-    );
-    flamePath.close();
-
-    // Gradiente de llama
-    final flameRect =
-        Rect.fromLTWH(fx - w * 0.06, fy - h * 0.14, w * 0.12, h * 0.13);
-    final flamePaint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [const Color(0xFFFFF176), const Color(0xFFFF9800)],
-      ).createShader(flameRect);
-    canvas.drawPath(flamePath, flamePaint);
-
-    // Brillo de la llama
-    final flameGlowPaint = Paint()
-      ..color = const Color(0xFFFFCC02).withOpacity(0.4)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
-    canvas.drawPath(flamePath, flameGlowPaint);
-
-    // === Perlas decorativas ===
-    _drawPearls(canvas, w, h);
-  }
-
-  void _drawWavyFrosting(Canvas canvas, double startX, double startY,
-      double width, double totalH, Color color) {
-    final path = Path();
-    final waveH = totalH * 0.055;
-    final count = 6;
-    final segmentW = width / count;
-    path.moveTo(startX, startY);
-    for (int i = 0; i < count; i++) {
-      path.cubicTo(
-        startX + segmentW * i + segmentW * 0.25,
-        startY - waveH,
-        startX + segmentW * i + segmentW * 0.75,
-        startY - waveH,
-        startX + segmentW * (i + 1),
-        startY,
-      );
-    }
-    path.lineTo(startX + width, startY + totalH * 0.04);
-    path.lineTo(startX, startY + totalH * 0.04);
-    path.close();
-
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-    canvas.drawPath(path, paint);
-  }
-
-  void _drawPearls(Canvas canvas, double w, double h) {
-    final pearlPaint = Paint()
-      ..color = const Color(0xFFFF8FAD)
-      ..style = PaintingStyle.fill;
-
-    final positions = [
-      Offset(w * 0.15, h * 0.59),
-      Offset(w * 0.27, h * 0.59),
-      Offset(w * 0.39, h * 0.59),
-      Offset(w * 0.51, h * 0.59),
-      Offset(w * 0.63, h * 0.59),
-      Offset(w * 0.75, h * 0.59),
-      Offset(w * 0.87, h * 0.59),
-      Offset(w * 0.25, h * 0.345),
-      Offset(w * 0.38, h * 0.345),
-      Offset(w * 0.50, h * 0.345),
-      Offset(w * 0.63, h * 0.345),
-      Offset(w * 0.76, h * 0.345),
-    ];
-
-    for (final pos in positions) {
-      canvas.drawCircle(pos, 3.5, pearlPaint);
-      canvas.drawCircle(
-        pos - const Offset(1, 1),
-        1.2,
-        Paint()..color = Colors.white.withOpacity(0.7),
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

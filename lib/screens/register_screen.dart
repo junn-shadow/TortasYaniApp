@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:provider/provider.dart';
 // ignore: unused_import
 import 'login_screen.dart';
 import '../services/auth_service.dart';
+import '../providers/notifications_provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -94,7 +96,16 @@ class _RegisterScreenState extends State<RegisterScreen>
 
     setState(() => _isLoading = false);
 
+    if (!mounted) return;
+
     if (result['success'] == true) {
+      final notificationsProvider = Provider.of<NotificationsProvider>(context, listen: false);
+      notificationsProvider.addNotification(
+        title: "¡Bienvenido a Tortas Yani!",
+        body: "Gracias por registrarte, ${_nameController.text.trim()}. ¡Tu primera compra te espera!",
+        type: NotificationType.promo,
+      );
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Cuenta creada exitosamente 🎉'),
@@ -127,7 +138,7 @@ class _RegisterScreenState extends State<RegisterScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF5A4A42).withOpacity(0.04),
+            color: const Color(0xFF5A4A42).withValues(alpha: 0.04),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -205,7 +216,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(14),
                             boxShadow: [
-                              BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
+                              BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10),
                             ],
                           ),
                           child: const Icon(
@@ -244,10 +255,10 @@ class _RegisterScreenState extends State<RegisterScreen>
                               color: Colors.white,
                               shape: BoxShape.circle,
                               boxShadow: [
-                                BoxShadow(color: const Color(0xFFF07070).withOpacity(0.15), blurRadius: 15, offset: const Offset(0, 5)),
+                                BoxShadow(color: const Color(0xFFF07070).withValues(alpha: 0.15), blurRadius: 15, offset: const Offset(0, 5)),
                               ],
                               border: Border.all(
-                                color: const Color(0xFFF07070).withOpacity(0.2),
+                                color: const Color(0xFFF07070).withValues(alpha: 0.2),
                                 width: 3,
                               ),
                             ),
@@ -340,7 +351,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                             borderRadius: BorderRadius.circular(16),
                           ),
                           elevation: 8,
-                          shadowColor: const Color(0xFFF07070).withOpacity(0.5),
+                          shadowColor: const Color(0xFFF07070).withValues(alpha: 0.5),
                         ),
                         child: _isLoading
                             ? const SizedBox(

@@ -4,6 +4,7 @@ import '../utils/constants.dart';
 import 'app_home_screen.dart';
 import 'favorites_screen.dart';
 import 'profile_screen.dart';
+import 'chat_screen.dart';
 
 class AppMainScreen extends StatefulWidget {
   const AppMainScreen({super.key});
@@ -23,7 +24,7 @@ class _AppMainScreenState extends State<AppMainScreen> {
     pages = const [
       MyAppHomeScreen(),
       FavoritesScreen(),
-      Center(child: Text("Pedidos", style: TextStyle(color: Colors.white))),
+      ChatScreen(),
       ProfileScreen(),
     ];
   }
@@ -31,12 +32,12 @@ class _AppMainScreenState extends State<AppMainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 10, 17, 41),
+      backgroundColor: AppColors.backgroundColor,
       body: pages[selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: AppColors.whiteColor,
         currentIndex: selectedIndex,
-        selectedItemColor: const Color(0xFFE91E63),
+        selectedItemColor: const Color(0xFFF07070),
         unselectedItemColor: const Color(0xFF9E9E9E),
         type: BottomNavigationBarType.fixed,
         onTap: (value) => setState(() => selectedIndex = value),
@@ -50,8 +51,8 @@ class _AppMainScreenState extends State<AppMainScreen> {
             label: "Favoritos",
           ),
           BottomNavigationBarItem(
-            icon: Icon(selectedIndex == 2 ? Iconsax.bag5 : Iconsax.bag),
-            label: "Pedidos",
+            icon: Icon(selectedIndex == 2 ? Icons.chat_bubble_rounded : Icons.chat_bubble_outline_rounded),
+            label: "Yani AI",
           ),
           BottomNavigationBarItem(
             icon: Icon(selectedIndex == 3 ? Iconsax.user5 : Iconsax.user),

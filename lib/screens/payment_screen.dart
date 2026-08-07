@@ -78,7 +78,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFFE91E63),
+                          color: Color(0xFFF07070),
                         ),
                       ),
                     ],
@@ -88,7 +88,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: widget.tipoEntrega == "delivery"
-                          ? const Color(0xFFE91E63).withOpacity(0.15)
+                          ? const Color(0xFFF07070).withOpacity(0.15)
                           : Colors.green.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -97,14 +97,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       children: [
                         Icon(
                           widget.tipoEntrega == "delivery" ? Icons.delivery_dining : Icons.store,
-                          color: widget.tipoEntrega == "delivery" ? const Color(0xFFE91E63) : Colors.green,
+                          color: widget.tipoEntrega == "delivery" ? const Color(0xFFF07070) : Colors.green,
                           size: 16,
                         ),
                         const SizedBox(width: 6),
                         Text(
                           widget.tipoEntrega == "delivery" ? "Delivery a domicilio" : "Recojo en local",
                           style: TextStyle(
-                            color: widget.tipoEntrega == "delivery" ? const Color(0xFFE91E63) : Colors.green,
+                            color: widget.tipoEntrega == "delivery" ? const Color(0xFFF07070) : Colors.green,
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                           ),
@@ -128,7 +128,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               ),
               child: const Column(
                 children: [
-                  Icon(Icons.info_outline, color: Color(0xFFE91E63), size: 30),
+                  Icon(Icons.info_outline, color: Color(0xFFF07070), size: 30),
                   SizedBox(height: 12),
                   Text(
                     "Coordinación de pago",
@@ -186,7 +186,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         ? cart.totalPrice + 5
         : cart.totalPrice;
     final orderNumber = "TY-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}";
-    final whatsappNumber = "51919576034";
+    const whatsappNumber = "51919576034";
 
     final StringBuffer mensaje = StringBuffer();
     mensaje.writeln("🎂 *NUEVO PEDIDO - Tortas Yani*");
@@ -220,6 +220,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
     }
+
+    if (!mounted) return;
 
     Navigator.pushAndRemoveUntil(
       context,
@@ -278,7 +280,7 @@ class PaymentSuccessScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: const Color(0xFF1A2340),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE91E63).withOpacity(0.3)),
+                  border: Border.all(color: const Color(0xFFF07070).withOpacity(0.3)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -286,7 +288,7 @@ class PaymentSuccessScreen extends StatelessWidget {
                     const Text("N° Pedido", style: TextStyle(color: Colors.white54, fontSize: 13)),
                     Text(
                       orderNumber,
-                      style: const TextStyle(color: Color(0xFFE91E63), fontSize: 15, fontWeight: FontWeight.bold),
+                      style: const TextStyle(color: Color(0xFFF07070), fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -304,7 +306,7 @@ class PaymentSuccessScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.info_outline, color: Color(0xFFE91E63), size: 18),
+                        Icon(Icons.info_outline, color: Color(0xFFF07070), size: 18),
                         SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -317,7 +319,7 @@ class PaymentSuccessScreen extends StatelessWidget {
                     SizedBox(height: 10),
                     Row(
                       children: [
-                        Icon(Icons.access_time, color: Color(0xFFE91E63), size: 18),
+                        Icon(Icons.access_time, color: Color(0xFFF07070), size: 18),
                         SizedBox(width: 8),
                         Text(
                           "Tiempo de respuesta: ~30 minutos",
@@ -343,7 +345,7 @@ class PaymentSuccessScreen extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE91E63),
+                    backgroundColor: const Color(0xFFF07070),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                     elevation: 0,

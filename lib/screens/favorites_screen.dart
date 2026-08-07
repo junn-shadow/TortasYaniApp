@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/favorites_provider.dart';
 import 'custom_cake_popup.dart';
+
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
 
@@ -10,68 +13,95 @@ class FavoritesScreen extends StatelessWidget {
     final favorites = Provider.of<FavoritesProvider>(context);
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 10, 17, 41),
+      backgroundColor: const Color(0xFFFFFDF8),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1035),
+        backgroundColor: const Color(0xFFFFFDF8),
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Color(0xFF5A4A42)),
         title: Row(
           children: [
-            const Text(
+            Text(
               "Mis Favoritos ❤️",
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: GoogleFonts.poppins(
+                color: const Color(0xFF5A4A42),
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
             ),
             const SizedBox(width: 8),
             if (favorites.totalFavorites > 0)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE91E63),
+                  color: const Color(0xFFF07070),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   "${favorites.totalFavorites}",
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
           ],
         ),
-        elevation: 0,
       ),
-      body: favorites.favorites.isEmpty
-          ? Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text("❤️", style: TextStyle(fontSize: 80)),
-            SizedBox(height: 20),
-            Text(
-              "No tienes favoritos aún",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFFFF0F5),
+              Color(0xFFFFFDF8),
+            ],
+          ),
+        ),
+        child: favorites.favorites.isEmpty
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("❤️", style: TextStyle(fontSize: 80)),
+                    const SizedBox(height: 20),
+                    Text(
+                      "No tienes favoritos aún",
+                      style: GoogleFonts.poppins(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF5A4A42),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "Toca el corazón en las tarjetas",
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: const Color(0xFF8D7A70),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : GridView.builder(
+                padding: const EdgeInsets.all(16),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.75,
+                ),
+                itemCount: favorites.favorites.length,
+                itemBuilder: (context, index) {
+                  final torta = favorites.favorites[index];
+                  return _favCard(context, torta, favorites)
+                      .animate()
+                      .fade(duration: 400.ms, delay: (50 * index).ms)
+                      .slideY(begin: 0.1, duration: 400.ms, delay: (50 * index).ms);
+                },
               ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              "Toca el corazón en las tarjetas",
-              style: TextStyle(fontSize: 14, color: Colors.white54),
-            ),
-          ],
-        ),
-      )
-          : GridView.builder(
-        padding: const EdgeInsets.all(16),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 0.75,
-        ),
-        itemCount: favorites.favorites.length,
-        itemBuilder: (context, index) {
-          final torta = favorites.favorites[index];
-          return _favCard(context, torta, favorites);
-        },
       ),
     );
   }
@@ -80,11 +110,11 @@ class FavoritesScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFE91E63).withOpacity(0.10),
-            blurRadius: 20,
+            color: const Color(0xFF5A4A42).withOpacity(0.06),
+            blurRadius: 18,
             offset: const Offset(0, 8),
           ),
         ],
@@ -92,84 +122,114 @@ class FavoritesScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            child: Stack(
-              children: [
-                Image.network(
-                  torta["imagen"],
-                  height: 140,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    height: 140,
-                    color: const Color(0xFF1A2340),
-                    child: const Center(child: Text("🎂", style: TextStyle(fontSize: 40))),
-                  ),
-                ),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: GestureDetector(
-                    onTap: () => favorites.toggleFavorite(torta),
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.9),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.favorite, color: Color(0xFFE91E63), size: 17),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.network(
+                    torta["imagen"],
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      color: const Color(0xFFFFF0F5),
+                      child: const Center(child: Text("🎂", style: TextStyle(fontSize: 40))),
                     ),
                   ),
-                ),
-              ],
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: GestureDetector(
+                      onTap: () => favorites.toggleFavorite(torta),
+                      child: Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.9),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.favorite, color: Color(0xFFF07070), size: 16),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
+            padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   torta["nombre"],
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black87),
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF5A4A42),
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 Text(
                   torta["descripcion"],
-                  style: const TextStyle(fontSize: 10, color: Colors.grey),
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    color: const Color(0xFF8D7A70),
+                  ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Icon(Icons.star, color: Color(0xFFE91E63), size: 13),
-                    const SizedBox(width: 2),
-                    Text("${torta["rating"]}", style: const TextStyle(fontSize: 11, color: Colors.grey)),
-                  ],
-                ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      "S/ ${torta["precio"].toStringAsFixed(0)}",
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFFE91E63)),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.star_rounded, color: Colors.amber, size: 14),
+                            const SizedBox(width: 2),
+                            Text(
+                              "${torta["rating"]}",
+                              style: GoogleFonts.poppins(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF5A4A42),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          "S/ ${torta["precio"].toStringAsFixed(0)}",
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFFF07070),
+                          ),
+                        ),
+                      ],
                     ),
                     GestureDetector(
                       onTap: () => mostrarPopupPersonalizacion(context, torta),
                       child: Container(
-                        width: 28,
-                        height: 28,
+                        width: 32,
+                        height: 32,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE91E63),
-                          borderRadius: BorderRadius.circular(8),
+                          color: const Color(0xFFF07070),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFF07070).withOpacity(0.3),
+                              blurRadius: 6,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
                         ),
-                        child: const Icon(Icons.add, color: Colors.white, size: 18),
+                        child: const Icon(Icons.add_rounded, color: Colors.white, size: 20),
                       ),
                     ),
                   ],

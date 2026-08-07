@@ -1,7 +1,41 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 class FavoritesProvider extends ChangeNotifier {
+  static const String _boxName = 'favorites';
+  late Box<String> _box;
   final List<Map<String, dynamic>> _favorites = [];
+
+  FavoritesProvider() {
+    _init();
+  }
+
+  Future<void> _init() async {
+    _box = await Hive.openBox<String>(_boxName);
+    _loadFromBox();
+  }
+
+  void _loadFromBox() {
+    _favorites.clear();
+    final String? jsonStr = _box.get('items');
+    if (jsonStr != null) {
+      try {
+        final List<dynamic> list = jsonDecode(jsonStr);
+        for (var item in list) {
+          _favorites.add(item as Map<String, dynamic>);
+        }
+      } catch (e) {
+        debugPrint("Error loading favorites from Hive: $e");
+      }
+    }
+    notifyListeners();
+  }
+
+  void _saveToBox() {
+    final String jsonStr = jsonEncode(_favorites);
+    _box.put('items', jsonStr);
+  }
 
   List<Map<String, dynamic>> get favorites => _favorites;
 
@@ -18,6 +52,7 @@ class FavoritesProvider extends ChangeNotifier {
     } else {
       _favorites.add(torta);
     }
+    _saveToBox();
     notifyListeners();
   }
 }

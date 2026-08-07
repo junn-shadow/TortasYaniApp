@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 class CartItem {
   final String nombre;
@@ -10,6 +12,7 @@ class CartItem {
   final int porciones;
   final String colorDecoracion;
   final String mensaje;
+  final String descripcion;
   int cantidad;
 
   CartItem({
@@ -22,14 +25,75 @@ class CartItem {
     required this.porciones,
     required this.colorDecoracion,
     required this.mensaje,
+    this.descripcion = '',
     this.cantidad = 1,
   });
 
   double get subtotal => precio * cantidad;
+
+  Map<String, dynamic> toJson() => {
+        'nombre': nombre,
+        'imagen': imagen,
+        'precio': precio,
+        'tamanio': tamanio,
+        'sabor': sabor,
+        'pisos': pisos,
+        'porciones': porciones,
+        'colorDecoracion': colorDecoracion,
+        'mensaje': mensaje,
+        'descripcion': descripcion,
+        'cantidad': cantidad,
+      };
+
+  factory CartItem.fromJson(Map<String, dynamic> json) => CartItem(
+        nombre: json['nombre'] ?? '',
+        imagen: json['imagen'] ?? '',
+        precio: (json['precio'] ?? 0.0).toDouble(),
+        tamanio: json['tamanio'] ?? '',
+        sabor: json['sabor'] ?? '',
+        pisos: json['pisos'] ?? 0,
+        porciones: json['porciones'] ?? 0,
+        colorDecoracion: json['colorDecoracion'] ?? '',
+        mensaje: json['mensaje'] ?? '',
+        descripcion: json['descripcion'] ?? '',
+        cantidad: json['cantidad'] ?? 1,
+      );
 }
 
 class CartProvider extends ChangeNotifier {
+  static const String _boxName = 'cart';
+  late Box<String> _box;
   final List<CartItem> _items = [];
+
+  CartProvider() {
+    _init();
+  }
+
+  Future<void> _init() async {
+    _box = await Hive.openBox<String>(_boxName);
+    _loadFromBox();
+  }
+
+  void _loadFromBox() {
+    _items.clear();
+    final String? jsonStr = _box.get('items');
+    if (jsonStr != null) {
+      try {
+        final List<dynamic> list = jsonDecode(jsonStr);
+        for (var item in list) {
+          _items.add(CartItem.fromJson(item as Map<String, dynamic>));
+        }
+      } catch (e) {
+        debugPrint("Error loading cart from Hive: $e");
+      }
+    }
+    notifyListeners();
+  }
+
+  void _saveToBox() {
+    final String jsonStr = jsonEncode(_items.map((i) => i.toJson()).toList());
+    _box.put('items', jsonStr);
+  }
 
   List<CartItem> get items => _items;
 
@@ -46,6 +110,7 @@ class CartProvider extends ChangeNotifier {
     int porciones,
     String colorDecoracion,
     String mensaje,
+    String descripcion,
   ) {
     final index = _items.indexWhere(
           (item) => item.nombre == torta["nombre"] && 
@@ -70,18 +135,22 @@ class CartProvider extends ChangeNotifier {
         porciones: porciones,
         colorDecoracion: colorDecoracion,
         mensaje: mensaje,
+        descripcion: descripcion,
       ));
     }
+    _saveToBox();
     notifyListeners();
   }
 
   void removeItem(int index) {
     _items.removeAt(index);
+    _saveToBox();
     notifyListeners();
   }
 
   void increaseQuantity(int index) {
     _items[index].cantidad++;
+    _saveToBox();
     notifyListeners();
   }
 
@@ -91,11 +160,13 @@ class CartProvider extends ChangeNotifier {
     } else {
       _items.removeAt(index);
     }
+    _saveToBox();
     notifyListeners();
   }
 
   void clearCart() {
     _items.clear();
+    _saveToBox();
     notifyListeners();
   }
 }
