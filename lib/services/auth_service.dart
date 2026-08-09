@@ -9,7 +9,7 @@ class AuthService {
   // CONFIGURACIÓN DE URL DINÁMICA SEGÚN PLATAFORMA
   // -----------------------------------------------------------------
   static String get baseUrl {
-    return 'https://tortasyaniapi-production-351a.up.railway.app/api';
+    return 'https://tortasyaniapiweb-production.up.railway.app/api';
   }
 
   static Future<Map<String, dynamic>> login(
