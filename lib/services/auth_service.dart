@@ -9,19 +9,7 @@ class AuthService {
   // CONFIGURACIÓN DE URL DINÁMICA SEGÚN PLATAFORMA
   // -----------------------------------------------------------------
   static String get baseUrl {
-    if (kIsWeb) {
-      return 'http://localhost:8080/api';
-    }
-    if (Platform.isAndroid) {
-      return 'http://10.0.2.2:8080/api';
-    }
-    if (Platform.isIOS) {
-      return 'http://localhost:8080/api';
-    }
-    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      return 'http://localhost:8080/api';
-    }
-    return 'http://192.168.1.X:8080/api'; // Fallback
+    return 'https://tortasyaniapi-production-351a.up.railway.app/api';
   }
 
   static Future<Map<String, dynamic>> login(
