@@ -65,7 +65,19 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
         );
       },
     );
-    if (hora != null) setState(() => _horaEntrega = hora);
+    if (hora != null) {
+      if (hora.hour < 10 || hora.hour > 20 || (hora.hour == 20 && hora.minute > 0)) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("El horario de atención es de 10:00 AM a 08:00 PM (10:00 - 20:00). Por favor selecciona una hora en ese rango."),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return;
+      }
+      setState(() => _horaEntrega = hora);
+    }
   }
 
   Future<void> _seleccionarUbicacion() async {
@@ -111,37 +123,37 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
     final itemsList = cart.items.map((i) => i.toJson()).toList();
 
     final StringBuffer mensaje = StringBuffer();
-    mensaje.writeln("🎂 *NUEVO PEDIDO - Tortas Yani*");
+    mensaje.writeln("*NUEVO PEDIDO - Tortas Yani*");
     mensaje.writeln("─────────────────────────");
-    mensaje.writeln("📋 *N° Pedido:* $orderNumber");
+    mensaje.writeln("*N° Pedido:* $orderNumber");
     mensaje.writeln();
-    mensaje.writeln("🛒 *Productos y Detalles:*");
+    mensaje.writeln("*Productos y Detalles:*");
     for (final item in cart.items) {
       mensaje.writeln("• ${item.cantidad}x ${item.nombre} - S/ ${item.subtotal.toStringAsFixed(0)}");
-      mensaje.writeln("  📏 Talla: ${item.tamanio}  |  🍰 ${item.sabor}  |  🏗️ ${item.pisos} pisos  |  👥 ${item.porciones} porc.");
+      mensaje.writeln("  Talla: ${item.tamanio}  |  ${item.sabor}  |  ${item.pisos} pisos  |  ${item.porciones} porc.");
       if (item.colorDecoracion != "Sin color específico" && item.colorDecoracion.isNotEmpty) {
-        mensaje.writeln("  🎨 Color: ${item.colorDecoracion}");
+        mensaje.writeln("  Color: ${item.colorDecoracion}");
       }
       if (item.mensaje != "Sin mensaje" && item.mensaje.isNotEmpty) {
-        mensaje.writeln("  ✍️ Mensaje: \"${item.mensaje}\"");
+        mensaje.writeln("  Mensaje: \"${item.mensaje}\"");
       }
     }
     mensaje.writeln();
-    mensaje.writeln("📅 *Entrega:*");
-    mensaje.writeln("🗓️ Fecha: $fecha");
-    mensaje.writeln("⏰ Hora: $hora");
-    mensaje.writeln("🚚 Tipo: ${_tipoEntrega == "delivery" ? "Delivery" : "Recojo en local"}");
+    mensaje.writeln("*Entrega:*");
+    mensaje.writeln("Fecha: $fecha");
+    mensaje.writeln("Hora: $hora");
+    mensaje.writeln("Tipo: ${_tipoEntrega == "delivery" ? "Delivery" : "Recojo en local"}");
     if (_tipoEntrega == "delivery" && _ubicacion.isNotEmpty) {
-      mensaje.writeln("📍 Ubicación: $_ubicacion");
+      mensaje.writeln("Ubicación: $_ubicacion");
     }
     mensaje.writeln();
-    mensaje.writeln("💰 *Subtotal:* S/ ${cart.totalPrice.toStringAsFixed(0)}");
+    mensaje.writeln("*Subtotal:* S/ ${cart.totalPrice.toStringAsFixed(0)}");
     if (_tipoEntrega == "delivery") {
-      mensaje.writeln("🚚 *Delivery:* S/ 5");
+      mensaje.writeln("*Delivery:* S/ 5");
     }
-    mensaje.writeln("💰 *TOTAL: S/ ${total.toStringAsFixed(0)}*");
+    mensaje.writeln("*TOTAL: S/ ${total.toStringAsFixed(0)}*");
     mensaje.writeln();
-    mensaje.writeln("⏳ Por favor confirmar disponibilidad y coordinar el pago. ¡Gracias! 🙏");
+    mensaje.writeln("Por favor confirmar disponibilidad y coordinar el pago. Gracias.");
 
     // Grabar orden en base de datos local
     final newOrder = {
@@ -226,7 +238,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.backgroundColor,
         title: const Text(
-          "Detalles del pedido 🎂",
+          "Detalles del pedido",
           style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(

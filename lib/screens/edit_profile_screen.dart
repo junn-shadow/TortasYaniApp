@@ -222,6 +222,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
+  final String _maleAvatar = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80';
+  final String _femaleAvatar = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=250&q=80';
+
+  void _selectPresetAvatar(String url) {
+    setState(() {
+      _imageBytes = null;
+      _fotoPerfilBase64 = url;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -245,57 +255,61 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           children: [
             // FOTO DE PERFIL
             Center(
-              child: Stack(
+              child: Column(
                 children: [
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0xFFF07070), width: 2),
-                      color: Colors.white.withValues(alpha: 0.1),
-                    ),
-                    child: ClipOval(
-                      child: _imageBytes != null
-                          ? Image.memory(
-                              _imageBytes!,
-                              fit: BoxFit.cover,
-                              width: 100,
-                              height: 100,
-                            )
-                          : (_fotoPerfilBase64.startsWith('http')
-                              ? Image.network(
-                                  _fotoPerfilBase64,
+                  Stack(
+                    children: [
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: const Color(0xFFF07070), width: 2),
+                          color: Colors.white.withOpacity(0.1),
+                        ),
+                        child: ClipOval(
+                          child: _imageBytes != null
+                              ? Image.memory(
+                                  _imageBytes!,
                                   fit: BoxFit.cover,
                                   width: 100,
                                   height: 100,
                                 )
-                              : const Icon(
-                                  Icons.person,
-                                  color: Colors.white54,
-                                  size: 55,
-                                )),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: GestureDetector(
-                      onTap: _pickImage,
-                      child: Container(
-                        width: 32,
-                        height: 32,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFF07070),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.camera_alt,
-                          color: Colors.white,
-                          size: 16,
+                              : (_fotoPerfilBase64.startsWith('http')
+                                  ? Image.network(
+                                      _fotoPerfilBase64,
+                                      fit: BoxFit.cover,
+                                      width: 100,
+                                      height: 100,
+                                    )
+                                  : const Icon(
+                                      Icons.person,
+                                      color: Colors.white54,
+                                      size: 55,
+                                    )),
                         ),
                       ),
-                    ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: _pickImage,
+                          child: Container(
+                            width: 32,
+                            height: 32,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFF07070),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.camera_alt,
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

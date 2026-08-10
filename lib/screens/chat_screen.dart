@@ -29,9 +29,9 @@ class _ChatScreenState extends State<ChatScreen> {
   final Set<String> _processedCartKeys = {};
 
   final List<String> _quickSuggestions = [
-    "🎂 ¿Qué me recomiendas para un cumpleaños?",
-    "💍 Necesito una torta para una boda",
-    "🍫 ¿Cuál es la más vendida?",
+    "¿Qué me recomiendas para un cumpleaños?",
+    "Necesito una torta para una boda",
+    "¿Cuál es la más vendida?",
   ];
 
   @override
@@ -49,7 +49,7 @@ class _ChatScreenState extends State<ChatScreen> {
         // Mensaje de bienvenida inicial
         _messages.add({
           "role": "assistant",
-          "content": "¡Hola! Soy Yani 👋 ¿En qué te puedo ayudar hoy?",
+          "content": "¡Hola! Soy Yani. ¿En qué te puedo ayudar hoy?",
         });
       } else {
         // Cargar historial
@@ -69,7 +69,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _loadHistory();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text("✨ Nueva conversación iniciada"),
+        content: Text("Nueva conversación iniciada"),
         backgroundColor: Color(0xFFF07070),
         behavior: SnackBarBehavior.floating,
         duration: Duration(seconds: 2),
@@ -101,11 +101,10 @@ class _ChatScreenState extends State<ChatScreen> {
       final precio      = double.tryParse(match.group(7)!.trim()) ?? 0.0;
 
       // ─── GUARD ANTI-DUPLICADOS ───────────────────────────────────────────
-      // Genera una clave única basada en los datos del pedido + timestamp de sesión
       final cartKey = "${nombreTorta}_${tamanio}_${pisos}_${relleno}_${precio}_${DateTime.now().millisecondsSinceEpoch ~/ 5000}";
       if (_processedCartKeys.contains(cartKey)) {
         _scrollToBottom();
-        return; // Este pedido ya fue procesado, ignorar
+        return;
       }
       _processedCartKeys.add(cartKey);
       // ─────────────────────────────────────────────────────────────────────
@@ -140,29 +139,21 @@ class _ChatScreenState extends State<ChatScreen> {
         margin: const EdgeInsets.all(16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         duration: const Duration(seconds: 4),
-        content: Row(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("🛒", style: TextStyle(fontSize: 22)),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "¡Agregado al carrito!",
-                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14),
-                  ),
-                  Text(
-                    "$nombre · $tamanio · $pisos ${pisos == 1 ? 'piso' : 'pisos'} · $relleno",
-                    style: const TextStyle(color: Colors.white70, fontSize: 12),
-                  ),
-                  Text(
-                    "Total: S/ ${precio.toStringAsFixed(0)}",
-                    style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
+            const Text(
+              "¡Agregado al carrito!",
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14),
+            ),
+            Text(
+              "$nombre · $tamanio · $pisos ${pisos == 1 ? 'piso' : 'pisos'} · $relleno",
+              style: const TextStyle(color: Colors.white70, fontSize: 12),
+            ),
+            Text(
+              "Total: S/ ${precio.toStringAsFixed(0)}",
+              style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
             ),
           ],
         ),

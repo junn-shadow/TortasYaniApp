@@ -7,6 +7,52 @@ import '../services/session_service.dart';
 import '../providers/orders_provider.dart';
 import '../utils/constants.dart';
 
+String getSmartAvatarUrl(String name, String customFoto) {
+  if (customFoto.isNotEmpty && !customFoto.contains('torta_de_vainilla')) {
+    return customFoto;
+  }
+
+  const maleAvatars = [
+    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80',
+    'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=250&q=80',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=250&q=80',
+    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=250&q=80',
+    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80',
+    'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=250&q=80',
+    'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=250&q=80',
+    'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=250&q=80'
+  ];
+
+  const femaleAvatars = [
+    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=250&q=80',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
+    'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=250&q=80',
+    'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=250&q=80',
+    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=250&q=80',
+    'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=250&q=80',
+    'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=250&q=80',
+    'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=250&q=80'
+  ];
+
+  final cleanName = name.trim().isEmpty ? 'Usuario' : name.trim();
+  final firstName = cleanName.split(' ')[0].toLowerCase();
+
+  int hash = 0;
+  for (int i = 0; i < cleanName.length; i++) {
+    hash = (hash << 5) - hash + cleanName.codeUnitAt(i);
+  }
+  final positiveHash = hash.abs();
+
+  const femaleSuffixes = ['a', 'ía', 'eth', 'is', 'en', 'y'];
+  const femaleExceptions = ['carmen', 'isabel', 'luz', 'mercedes', 'pilar', 'rosario', 'raquel', 'ruth', 'beatriz', 'inez', 'ines', 'monica', 'veronica', 'sonia'];
+  const maleExceptions = ['luca', 'sasha', 'elias', 'nicolas', 'nicolás', 'matias', 'matías', 'tomas', 'tomás', 'josue', 'josué'];
+
+  final isFemale = (femaleExceptions.contains(firstName) || femaleSuffixes.any((s) => firstName.endsWith(s))) && !maleExceptions.contains(firstName);
+
+  final pool = isFemale ? femaleAvatars : maleAvatars;
+  return pool[positiveHash % pool.length];
+}
+
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -54,6 +100,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final ordersProvider = Provider.of<OrdersProvider>(context);
     final userOrders = ordersProvider.orders;
 
+    final avatarUrl = getSmartAvatarUrl(nombreCompleto, fotoPerfil);
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: SingleChildScrollView(
@@ -67,8 +115,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0xFFFFF0F5), // Blush rosado
-                    Color(0xFFFFFDF8), // Crema
+                    Color(0xFFFFF0F5),
+                    Color(0xFFFFFDF8),
                   ],
                 ),
                 borderRadius: BorderRadius.only(
@@ -100,24 +148,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ],
                             ),
                             child: ClipOval(
-                              child: fotoPerfil.isNotEmpty
-                                  ? (fotoPerfil.startsWith('http')
-                                      ? Image.network(
-                                          fotoPerfil,
-                                          fit: BoxFit.cover,
-                                          width: 100,
-                                          height: 100,
-                                        )
-                                      : Image.memory(
-                                          base64Decode(fotoPerfil),
-                                          fit: BoxFit.cover,
-                                          width: 100,
-                                          height: 100,
-                                        ))
-                                  : const Icon(
-                                      Icons.person,
-                                      color: Colors.black26,
-                                      size: 55,
+                              child: avatarUrl.startsWith('http')
+                                  ? Image.network(
+                                      avatarUrl,
+                                      fit: BoxFit.cover,
+                                      width: 100,
+                                      height: 100,
+                                    )
+                                  : Image.memory(
+                                      base64Decode(avatarUrl),
+                                      fit: BoxFit.cover,
+                                      width: 100,
+                                      height: 100,
                                     ),
                             ),
                           ),
