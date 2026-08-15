@@ -20,6 +20,23 @@ class SessionService {
     if (token != null) {
       await prefs.setString('token', token);
     }
+    // Inicializar timestamp de sesión activa
+    await prefs.setInt('lastActiveTime', DateTime.now().millisecondsSinceEpoch);
+  }
+
+  static Future<void> updateLastActiveTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('lastActiveTime', DateTime.now().millisecondsSinceEpoch);
+  }
+
+  static Future<bool> shouldSessionTimeout() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lastActive = prefs.getInt('lastActiveTime');
+    if (lastActive == null) return false;
+    final lastTime = DateTime.fromMillisecondsSinceEpoch(lastActive);
+    final now = DateTime.now();
+    final difference = now.difference(lastTime);
+    return difference.inMinutes >= 5;
   }
 
   static Future<Map<String, String>> getUser() async {

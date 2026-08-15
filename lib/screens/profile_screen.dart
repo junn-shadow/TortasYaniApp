@@ -259,6 +259,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             const SizedBox(height: 20),
 
+            _sectionTitle("Información del negocio"),
+
+            _infoCard([
+              _infoItem(Icons.access_time_outlined, "Horario de atención",
+                  "10:00 AM a 08:00 PM (Lunes a Domingo)"),
+            ]),
+
+            const SizedBox(height: 20),
+
             _sectionTitle("Historial de pedidos"),
 
             if (userOrders.isEmpty)

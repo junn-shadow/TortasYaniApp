@@ -121,6 +121,7 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
                 const SizedBox(height: 15),
                 headerParts(),
                 mySearchBar(),
+                businessHoursCard(),
                 promoCard(),
                 const SizedBox(height: 25),
                 categoriesSection(),
@@ -314,6 +315,67 @@ class _MyAppHomeScreenState extends State<MyAppHomeScreen> {
           ],
         ),
       ],
+    );
+  }
+
+  Widget businessHoursCard() {
+    final now = DateTime.now();
+    final isOpen = now.hour >= 10 && now.hour < 20;
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 15),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF0F2),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFFFD1D6).withOpacity(0.5)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.access_time_filled_rounded, color: Color(0xFFF07070), size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Horario de Atención",
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF4A0E17),
+                  ),
+                ),
+                Text(
+                  "Lunes a Domingo de 10:00 AM a 08:00 PM",
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    color: const Color(0xFF8A6B70),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: isOpen 
+                  ? const Color(0xFF16A34A).withOpacity(0.12)
+                  : const Color(0xFFD97706).withOpacity(0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              isOpen ? "Abierto" : "Cerrado",
+              style: TextStyle(
+                color: isOpen ? const Color(0xFF16A34A) : const Color(0xFFD97706),
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

@@ -77,6 +77,13 @@ class _LoginScreenState extends State<LoginScreen>
     final token = user['token'] ?? '';
     final email = user['email'] ?? '';
     if (token.isNotEmpty && email.isNotEmpty) {
+      final timedOut = await SessionService.shouldSessionTimeout();
+      if (timedOut) {
+        await SessionService.clearUser();
+        return;
+      }
+      await SessionService.updateLastActiveTime();
+
       if (email.trim().toLowerCase() == 'admin@gmail.com') {
         if (mounted) {
           Navigator.pushReplacement(
