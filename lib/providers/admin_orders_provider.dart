@@ -127,4 +127,13 @@ class AdminOrdersProvider extends ChangeNotifier {
     _orders.insert(0, order);
     notifyListeners();
   }
+
+  Future<void> deleteOrder(String id) async {
+    final index = _orders.indexWhere((o) => o['id'] == id);
+    if (index >= 0) {
+      _orders.removeAt(index);
+      await _box.delete(id);
+      notifyListeners();
+    }
+  }
 }

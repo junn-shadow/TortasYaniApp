@@ -22,6 +22,52 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
 
   String _selectedFilter = "Pendiente";
 
+  // Confirma la eliminación de un pedido
+  void _confirmDeleteOrder(BuildContext context, AdminOrdersProvider provider, Map<String, dynamic> order) {
+    showDialog(
+      context: context,
+      builder: (BuildContext ctx) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text(
+            "Eliminar Pedido",
+            style: TextStyle(color: Color(0xFF4A0E17), fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            "¿Estás seguro de que deseas eliminar permanentemente el pedido ${order["id"]}?",
+            style: const TextStyle(color: Color(0xFF8A6B70)),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text("Cancelar", style: TextStyle(color: Color(0xFF8D4B53))),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                provider.deleteOrder(order["id"]);
+                Navigator.of(ctx).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Pedido ${order["id"]} eliminado."),
+                    backgroundColor: Colors.redAccent,
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent.withOpacity(0.1),
+                foregroundColor: Colors.redAccent,
+                elevation: 0,
+                side: const BorderSide(color: Colors.redAccent, width: 1.0),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: const Text("Eliminar", style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   // Avanza el estado de un pedido
   void _nextStatus(AdminOrdersProvider provider, Map<String, dynamic> order) {
     final currentStatus = order["estado"];
@@ -247,22 +293,33 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                       ),
                     ],
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: _getStatusColor(estado).withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: _getStatusColor(estado).withOpacity(0.3)),
-                    ),
-                    child: Text(
-                      estado.toUpperCase(),
-                      style: TextStyle(
-                        color: _getStatusColor(estado),
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: _getStatusColor(estado).withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: _getStatusColor(estado).withOpacity(0.3)),
+                        ),
+                        child: Text(
+                          estado.toUpperCase(),
+                          style: TextStyle(
+                            color: _getStatusColor(estado),
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        constraints: const BoxConstraints(),
+                        padding: EdgeInsets.zero,
+                        icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 18),
+                        onPressed: () => _confirmDeleteOrder(context, provider, order),
+                      ),
+                    ],
                   ),
                 ],
               ),
