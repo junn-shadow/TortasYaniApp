@@ -3,6 +3,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'app_main_screen.dart';
 import 'register_screen.dart';
 import 'admin/admin_dashboard_screen.dart';
@@ -540,6 +541,16 @@ class _LoginScreenState extends State<LoginScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Drag handle
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
                 // Google Logo
                 SvgPicture.string(
                   '''<svg viewBox="0 0 24 24" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
@@ -578,7 +589,7 @@ class _LoginScreenState extends State<LoginScreen>
                     Navigator.pop(context);
                     _handleGoogleRealAuth("Yani López", "yanilopez@gmail.com", "google123");
                   },
-                ),
+                ).animate().fade(duration: 250.ms, delay: 50.ms).slideY(begin: 0.1),
                 const Divider(height: 1),
                 _buildGoogleAccountItem(
                   name: "Juan Pérez",
@@ -588,14 +599,14 @@ class _LoginScreenState extends State<LoginScreen>
                     Navigator.pop(context);
                     _handleGoogleRealAuth("Juan Pérez", "juanperez@gmail.com", "google123");
                   },
-                ),
+                ).animate().fade(duration: 250.ms, delay: 100.ms).slideY(begin: 0.1),
                 const Divider(height: 1),
                 _buildGoogleAccountItem(
                   name: "Usar otra cuenta",
                   email: "",
                   avatarIcon: Icons.account_circle_outlined,
                   onTap: () => _showGoogleCustomAuth(context),
-                ),
+                ).animate().fade(duration: 250.ms, delay: 150.ms).slideY(begin: 0.1),
                 
                 const SizedBox(height: 20),
                 Text(
@@ -684,6 +695,17 @@ class _LoginScreenState extends State<LoginScreen>
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
                   Center(
                     child: SvgPicture.string(
                       '''<svg viewBox="0 0 24 24" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
@@ -802,6 +824,18 @@ class _LoginScreenState extends State<LoginScreen>
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      // Drag handle
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          margin: const EdgeInsets.only(bottom: 15),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
                       // Facebook Header / Logo
                       Center(
                         child: Container(
