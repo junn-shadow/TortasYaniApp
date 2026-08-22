@@ -65,19 +65,19 @@ class _UserFormScreenState extends State<UserFormScreen> {
   Widget build(BuildContext context) {
     final isEdit = widget.user != null;
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF6F7),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFFD1D6),
+        backgroundColor: const Color(0xFF1E293B),
         title: Text(
           isEdit ? 'Editar usuario' : 'Añadir usuario',
-          style: const TextStyle(color: Color(0xFF6A1B29), fontWeight: FontWeight.bold),
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF6A1B29)),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         elevation: 1,
-        shadowColor: const Color(0xFFFFD1D6).withOpacity(0.5),
+        shadowColor: Colors.black26,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -98,36 +98,36 @@ class _UserFormScreenState extends State<UserFormScreen> {
                 DropdownButtonFormField<String>(
 
                   value: _rol,
-                  style: const TextStyle(color: Color(0xFF4A0E17), fontSize: 14),
-                  dropdownColor: const Color(0xFFFFF9FA),
+                  style: const TextStyle(color: Color(0xFF0F172A), fontSize: 14),
+                  dropdownColor: Colors.white,
                   decoration: InputDecoration(
                     labelText: 'Rol del usuario',
-                    labelStyle: const TextStyle(color: Color(0xFF8A6B70), fontSize: 13),
-                    prefixIcon: const Icon(Icons.security_rounded, color: Color(0xFFF07070), size: 20),
+                    labelStyle: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                    prefixIcon: const Icon(Icons.security_rounded, color: Color(0xFF1E293B), size: 20),
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: Color(0xFFFFD1D6)),
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: Color(0xFFFFD1D6)),
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: Color(0xFFF07070), width: 1.5),
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF1E293B), width: 1.5),
                     ),
                     contentPadding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   items: const [
                     DropdownMenuItem(
                       value: 'admin',
-                      child: Text('Administrador', style: TextStyle(color: Color(0xFF4A0E17))),
+                      child: Text('Administrador', style: TextStyle(color: Color(0xFF0F172A))),
                     ),
                     DropdownMenuItem(
                       value: 'client',
-                      child: Text('Cliente', style: TextStyle(color: Color(0xFF4A0E17))),
+                      child: Text('Cliente', style: TextStyle(color: Color(0xFF0F172A))),
                     ),
                   ],
                   onChanged: (v) => setState(() => _rol = v ?? 'client'),
@@ -137,22 +137,22 @@ class _UserFormScreenState extends State<UserFormScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFFFE4E6)),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
                         'Usuario Activo',
-                        style: TextStyle(color: Color(0xFF4A0E17), fontWeight: FontWeight.bold, fontSize: 14),
+                        style: TextStyle(color: Color(0xFF0F172A), fontWeight: FontWeight.bold, fontSize: 14),
                       ),
                       Switch(
                         value: _activo,
-                        activeColor: const Color(0xFFF07070),
-                        activeTrackColor: const Color(0xFFFFD1D6),
-                        inactiveThumbColor: const Color(0xFF8A6B70),
-                        inactiveTrackColor: const Color(0xFFFFE4E6),
+                        activeColor: Colors.white,
+                        activeTrackColor: const Color(0xFF1E293B),
+                        inactiveThumbColor: const Color(0xFF64748B),
+                        inactiveTrackColor: const Color(0xFFE2E8F0),
                         onChanged: (v) => setState(() => _activo = v),
                       ),
                     ],
@@ -165,11 +165,10 @@ class _UserFormScreenState extends State<UserFormScreen> {
                   child: ElevatedButton(
                     onPressed: _save,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF07070),
+                      backgroundColor: const Color(0xFF1E293B),
                       foregroundColor: Colors.white,
-                      elevation: 4,
-                      shadowColor: const Color(0xFFF07070).withOpacity(0.3),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     child: Text(
                       isEdit ? 'Guardar cambios' : 'Crear usuario',
@@ -197,31 +196,31 @@ class _UserFormScreenState extends State<UserFormScreen> {
       keyboardType: keyboard,
       maxLines: maxLines,
       validator: (v) => (v == null || v.isEmpty) ? 'Campo obligatorio' : null,
-      style: const TextStyle(color: Color(0xFF4A0E17), fontSize: 14),
+      style: const TextStyle(color: Color(0xFF0F172A), fontSize: 14),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Color(0xFF8A6B70), fontSize: 13),
-        prefixIcon: Icon(icon, color: const Color(0xFFF07070), size: 20),
+        labelStyle: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+        prefixIcon: Icon(icon, color: const Color(0xFF1E293B), size: 20),
         filled: true,
         fillColor: Colors.white,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFFFFD1D6)),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFFFFD1D6)),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFFF07070), width: 1.5),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF1E293B), width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Colors.redAccent, width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
         ),
         contentPadding: const EdgeInsets.symmetric(vertical: 16),
