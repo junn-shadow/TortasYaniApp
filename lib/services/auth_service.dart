@@ -35,25 +35,28 @@ class AuthService {
         );
         return result;
       } else {
-        // Fallback for development if backend fails authentication
-        throw Exception('Backend auth failed');
+        // Return backend failure response directly (invalid credentials / deleted user)
+        return result;
       }
     } catch (e) {
       print('=== FALLBACK LOGIN MOCK OFFLINE ===: $e');
       
-      final isDevAdmin = email.toLowerCase().contains('admin');
-      final nameMock = email.split('@')[0];
+      final lowerEmail = email.trim().toLowerCase();
+      // Only allow pre-seeded test accounts offline
+      if (lowerEmail == 'admin@gmail.com' || lowerEmail == 'carla@gmail.com' || lowerEmail == 'roberto@gmail.com') {
+        final nameMock = lowerEmail.split('@')[0];
+        await SessionService.saveUser(
+          nombreCompleto: nameMock,
+          email: email,
+          telefono: '999999999',
+          direccion: 'Dirección Mock',
+          fotoPerfil: '',
+          token: 'mock-jwt-token-flutter',
+        );
+        return {'success': true, 'message': 'Inicio de sesión offline/mock concedido'};
+      }
       
-      await SessionService.saveUser(
-        nombreCompleto: nameMock,
-        email: email,
-        telefono: '999999999',
-        direccion: 'Dirección Mock',
-        fotoPerfil: '',
-        token: 'mock-jwt-token-flutter',
-      );
-      
-      return {'success': true, 'message': 'Inicio de sesión offline/mock concedido'};
+      return {'success': false, 'message': 'Error de conexión. No se pudo validar las credenciales.'};
     }
   }
 
