@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../providers/cart_provider.dart';
+import '../services/mercado_pago_service.dart';
 import 'app_main_screen.dart';
 
 class PaymentScreen extends StatefulWidget {
@@ -144,7 +145,29 @@ class _PaymentScreenState extends State<PaymentScreen> {
               ),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 24),
+
+            // MERCADO PAGO BUTTON
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton.icon(
+                onPressed: _isProcessing ? null : () => _processMercadoPago(context, cart),
+                icon: const Icon(Icons.payment, color: Colors.white, size: 22),
+                label: const Text(
+                  "Pagar con Mercado Pago (Tarjeta / Yape)",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF009EE3),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  elevation: 0,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 14),
 
             SizedBox(
               width: double.infinity,
@@ -158,7 +181,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text(
                   "Enviar pedido por WhatsApp",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF25D366),
@@ -174,6 +197,39 @@ class _PaymentScreenState extends State<PaymentScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _processMercadoPago(BuildContext context, CartProvider cart) async {
+    setState(() => _isProcessing = true);
+    final total = widget.tipoEntrega == "delivery" ? cart.totalPrice + 5 : cart.totalPrice;
+    final orderNumber = "TY-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}";
+
+    final itemsPayload = cart.items.map((item) => {
+      'title': '${item.nombre} (${item.tamanio})',
+      'quantity': item.cantidad,
+      'price': item.precio,
+    }).toList();
+
+    final success = await MercadoPagoService.startPaymentProcess(
+      orderId: orderNumber,
+      totalAmount: total,
+      items: itemsPayload,
+      clientName: 'Cliente Tortas Yani',
+      clientEmail: 'cliente@tortasyani.com',
+    );
+
+    setState(() => _isProcessing = false);
+
+    if (mounted) {
+      cart.clearCart();
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (_) => PaymentSuccessScreen(orderNumber: orderNumber),
+        ),
+        (route) => false,
+      );
+    }
   }
 
   Future<void> _processPay(BuildContext context, CartProvider cart) async {
