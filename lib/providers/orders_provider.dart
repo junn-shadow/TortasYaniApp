@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:http/http.dart' as http;
 
 class OrdersProvider extends ChangeNotifier {
   static const String _boxName = 'user_orders';
+  static const String _baseUrl = 'https://tortasyaniapiweb-production.up.railway.app/api/orders';
   late Box<String> _box;
   final List<Map<String, dynamic>> _orders = [];
 
@@ -50,6 +52,17 @@ class OrdersProvider extends ChangeNotifier {
     
     _orders.insert(0, order);
     notifyListeners();
+
+    // Sincronización asíncrona con el Cloud (Angular Panel)
+    try {
+      await http.post(
+        Uri.parse(_baseUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonStr,
+      ).timeout(const Duration(seconds: 4));
+    } catch (e) {
+      debugPrint("Error sincronizando nueva orden de cliente con la Nube (Offline fallback): $e");
+    }
   }
 
   Future<void> clearOrders() async {

@@ -220,7 +220,21 @@ class _MapScreenState extends State<MapScreen> {
                         : () {
                             final mapsUrl =
                                 "https://maps.google.com/?q=${_selectedLocation!.latitude},${_selectedLocation!.longitude}";
-                            Navigator.pop(context, mapsUrl);
+                            
+                            final Distance distance = const Distance();
+                            final double meter = distance.as(LengthUnit.Meter, _initialLocation, _selectedLocation!);
+                            final double km = meter / 1000.0;
+                            
+                            double cost = 5.0;
+                            if (km > 3.0) {
+                              cost += (km - 3.0) * 1.5;
+                            }
+                            
+                            Navigator.pop(context, {
+                              'url': mapsUrl,
+                              'distance': km,
+                              'cost': cost
+                            });
                           },
                     icon: const Icon(Icons.check_circle, color: Colors.white),
                     label: const Text(

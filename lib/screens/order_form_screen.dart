@@ -21,6 +21,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   // VALORES SELECCIONADOS
   String _tipoEntrega = "delivery";
   String _ubicacion = "";
+  double _deliveryCost = 0.0;
   DateTime? _fechaEntrega;
   TimeOfDay? _horaEntrega;
 
@@ -85,8 +86,11 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       context,
       MaterialPageRoute(builder: (_) => const MapScreen()),
     );
-    if (resultado != null) {
-      setState(() => _ubicacion = resultado);
+    if (resultado != null && resultado is Map<String, dynamic>) {
+      setState(() {
+        _ubicacion = resultado['url'] as String;
+        _deliveryCost = resultado['cost'] as double;
+      });
     }
   }
 
@@ -119,7 +123,8 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
     const whatsappNumber = "51919576034";
     final fecha = "${_fechaEntrega!.day}/${_fechaEntrega!.month}/${_fechaEntrega!.year}";
     final hora = "${_horaEntrega!.hour.toString().padLeft(2, '0')}:${_horaEntrega!.minute.toString().padLeft(2, '0')}";
-    final total = _tipoEntrega == "delivery" ? cart.totalPrice + 5 : cart.totalPrice;
+    final total = _tipoEntrega == "delivery" ? cart.totalPrice + _deliveryCost : cart.totalPrice;
+    final adelanto = total * 0.5;
     final itemsList = cart.items.map((i) => i.toJson()).toList();
 
     final StringBuffer mensaje = StringBuffer();
@@ -147,11 +152,13 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       mensaje.writeln("Ubicación: $_ubicacion");
     }
     mensaje.writeln();
-    mensaje.writeln("*Subtotal:* S/ ${cart.totalPrice.toStringAsFixed(0)}");
+    mensaje.writeln("*Subtotal:* S/ ${cart.totalPrice.toStringAsFixed(2)}");
     if (_tipoEntrega == "delivery") {
-      mensaje.writeln("*Delivery:* S/ 5");
+      mensaje.writeln("*Delivery:* S/ ${_deliveryCost.toStringAsFixed(2)}");
     }
-    mensaje.writeln("*TOTAL: S/ ${total.toStringAsFixed(0)}*");
+    mensaje.writeln("*TOTAL:* S/ ${total.toStringAsFixed(2)}");
+    mensaje.writeln("*ADELANTO PAGADO (50%):* S/ ${adelanto.toStringAsFixed(2)}");
+    mensaje.writeln("*SALDO PENDIENTE:* S/ ${adelanto.toStringAsFixed(2)}");
     mensaje.writeln();
     mensaje.writeln("Por favor confirmar disponibilidad y coordinar el pago. Gracias.");
 
@@ -159,10 +166,15 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
     final newOrder = {
       "id": orderNumber,
       "estado": "Pendiente",
+      "estadoPago": "Pendiente",
       "total": total,
+      "montoAdelanto": adelanto,
+      "saldoPendiente": adelanto,
       "fechaStr": "$fecha - $hora",
       "tipoEntrega": _tipoEntrega,
       "items": itemsList,
+      "chatId": DateTime.now().millisecondsSinceEpoch.toString(), // Historial/Chat ID Anti-negación
+      "chatHistory": mensaje.toString(),
     };
     await ordersProvider.addOrder(newOrder);
 
@@ -231,7 +243,8 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
-    final total = _tipoEntrega == "delivery" ? cart.totalPrice + 5 : cart.totalPrice;
+    final total = _tipoEntrega == "delivery" ? cart.totalPrice + _deliveryCost : cart.totalPrice;
+    final adelanto = total * 0.5;
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
@@ -379,7 +392,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                     color: _tipoEntrega == "delivery" ? const Color(0xFFF07070) : Colors.black54,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13)),
-                                Text("+ S/ 5", style: TextStyle(color: _tipoEntrega == "delivery" ? const Color(0xFFF07070).withOpacity(0.8) : Colors.black38, fontSize: 11)),
+                                Text("+ S/ ${_deliveryCost > 0 ? _deliveryCost.toStringAsFixed(2) : '5.00'}", style: TextStyle(color: _tipoEntrega == "delivery" ? const Color(0xFFF07070).withOpacity(0.8) : Colors.black38, fontSize: 11)),
                               ],
                             ),
                           ),
@@ -469,7 +482,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text("Delivery:", style: TextStyle(color: Colors.black54, fontSize: 14)),
-                      Text(_tipoEntrega == "delivery" ? "S/ 5" : "Gratis", style: const TextStyle(color: Colors.black87, fontSize: 14)),
+                      Text(_tipoEntrega == "delivery" ? "S/ ${_deliveryCost.toStringAsFixed(2)}" : "Gratis", style: const TextStyle(color: Colors.black87, fontSize: 14)),
                     ],
                   ),
                   const Padding(
@@ -479,9 +492,9 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Total a pagar:", style: TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.bold)),
+                      const Text("Adelanto a pagar (50%):", style: TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.bold)),
                       Text(
-                        "S/ ${total.toStringAsFixed(0)}",
+                        "S/ ${adelanto.toStringAsFixed(2)}",
                         style: const TextStyle(color: Color(0xFFF07070), fontSize: 22, fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -491,7 +504,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                     outerColor: const Color(0xFFF07070),
                     innerColor: Colors.white,
                     sliderButtonIcon: const Icon(Icons.arrow_forward_ios, color: Color(0xFFF07070)),
-                    text: "Desliza para pedir",
+                    text: "CONFIRMAR Y PAGAR",
                     textStyle: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                     onSubmit: () async {
                       await _enviarPedido();
