@@ -113,7 +113,7 @@ Tras confirmarlo, di: "Excelente, ya armé tu pedido. Por favor selecciona el í
           "Content-Type": "application/json"
         },
         body: jsonEncode({
-          "model": "llama-3.3-70b-versatile",
+          "model": "llama-3.1-8b-instant",
           "messages": _messages.map((m) => m.toJson()).toList(),
           "temperature": 0.7,
           "max_tokens": 500
