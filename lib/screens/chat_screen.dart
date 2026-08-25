@@ -179,6 +179,38 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() => _isSending = false);
   }
 
+  Widget _buildMessageContent(String content, bool isUser) {
+    final regex = RegExp(r'\[ADD_CART:[^\]]+\]');
+    final cleanText = content.replaceAll(regex, '').trim();
+
+    final List<TextSpan> spans = [];
+    final parts = cleanText.split('**');
+    
+    for (int i = 0; i < parts.length; i++) {
+      final isBold = i % 2 == 1;
+      spans.add(
+        TextSpan(
+          text: parts[i],
+          style: TextStyle(
+            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+            color: isUser ? Colors.white : Colors.black87,
+          ),
+        ),
+      );
+    }
+
+    return RichText(
+      text: TextSpan(
+        style: TextStyle(
+          fontSize: 14.5,
+          height: 1.4,
+          fontFamily: GoogleFonts.poppins().fontFamily,
+        ),
+        children: spans,
+      ),
+    );
+  }
+
   void _scrollToBottom() {
     Future.delayed(const Duration(milliseconds: 100), () {
       if (_scrollController.hasClients) {
@@ -377,14 +409,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               )
                             ],
                           ),
-                          child: Text(
-                            msg["content"],
-                            style: TextStyle(
-                              color: isUser ? Colors.white : Colors.black87,
-                              fontSize: 14.5,
-                              height: 1.4,
-                            ),
-                          ),
+                          child: _buildMessageContent(msg["content"], isUser),
                         ),
                       ),
                     ],
