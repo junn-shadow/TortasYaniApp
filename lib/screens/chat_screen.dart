@@ -181,18 +181,20 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget _buildMessageContent(String content, bool isUser) {
     final regex = RegExp(r'\[ADD_CART:[^\]]+\]');
-    final cleanText = content.replaceAll(regex, '').trim();
+    var cleanText = content.replaceAll(regex, '').trim();
+
+    // Reemplazar Bienvenido/aa con Bienvenido/a
+    cleanText = cleanText.replaceAll(RegExp(r'Bienvenido/aa', caseSensitive: false), 'Bienvenido/a');
 
     final List<TextSpan> spans = [];
     final parts = cleanText.split('**');
     
     for (int i = 0; i < parts.length; i++) {
-      final isBold = i % 2 == 1;
       spans.add(
         TextSpan(
           text: parts[i],
           style: TextStyle(
-            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+            fontWeight: FontWeight.normal, // No usar negrita
             color: isUser ? Colors.white : Colors.black87,
           ),
         ),
