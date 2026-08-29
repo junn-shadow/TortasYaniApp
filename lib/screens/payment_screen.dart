@@ -318,6 +318,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   },
                 ),
               ),
+              const SizedBox(height: 10),
+              const Text(
+                "Titular: Ericson David Mendoza Diaz",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 15),
               const Text(
                 "Una vez realizado el Yapeo, por favor presiona el botón inferior para enviarnos tu constancia por WhatsApp.",
