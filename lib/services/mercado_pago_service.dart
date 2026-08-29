@@ -8,8 +8,8 @@ class MercadoPagoService {
   static const String accessToken = 'APP_USR-4971588647309567-082119-420e42538660e53c604a145e36e67945-3630907665';
   static const String _apiUrl = 'https://api.mercadopago.com/checkout/preferences';
 
-  /// Genera una preferencia de pago en Mercado Pago y abre la pasarela de pago en el navegador o app
-  static Future<bool> startPaymentProcess({
+  /// Genera una preferencia de pago en Mercado Pago y retorna el init_point
+  static Future<String?> startPaymentProcess({
     required String orderId,
     required double totalAmount,
     required List<Map<String, dynamic>> items,
@@ -53,11 +53,7 @@ class MercadoPagoService {
         final String? initPoint = data['init_point'] ?? data['sandbox_init_point'];
 
         if (initPoint != null && initPoint.isNotEmpty) {
-          final uri = Uri.parse(initPoint);
-          if (await canLaunchUrl(uri)) {
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
-            return true;
-          }
+          return initPoint;
         }
       } else {
         debugPrint('Error Mercado Pago HTTP ${response.statusCode}: ${response.body}');
@@ -65,6 +61,6 @@ class MercadoPagoService {
     } catch (e) {
       debugPrint('Excepción al iniciar pago con Mercado Pago: $e');
     }
-    return false;
+    return null;
   }
 }

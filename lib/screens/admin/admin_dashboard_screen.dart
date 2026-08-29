@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'admin_products_screen.dart';
 import 'admin_orders_screen.dart';
 import 'admin_user_screen.dart';
+import 'admin_invoices_screen.dart';
 import '../login_screen.dart';
 import '../../services/session_service.dart';
 
@@ -124,6 +125,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminUserScreen()));
+              },
+            ),
+            _buildDrawerItem(
+              icon: Iconsax.receipt_square,
+              title: 'Comprobantes SUNAT',
+              isActive: false,
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminInvoicesScreen()));
               },
             ),
             const Padding(

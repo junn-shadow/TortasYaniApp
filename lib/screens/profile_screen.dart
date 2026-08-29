@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'login_screen.dart';
 import 'edit_profile_screen.dart';
+import 'contact_screen.dart';
 import '../services/session_service.dart';
 import '../providers/orders_provider.dart';
 import '../utils/constants.dart';
@@ -296,6 +297,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
               }),
 
             const SizedBox(height: 20),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ContactScreen()),
+                    );
+                  },
+                  icon: const Icon(Icons.mail_outline),
+                  label: const Text(
+                    "Contáctanos",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: const Color(0xFFF07070),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      side: const BorderSide(color: Color(0xFFF07070)),
+                    ),
+                    elevation: 0,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 15),
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),

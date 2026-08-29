@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../providers/cart_provider.dart';
 import '../services/mercado_pago_service.dart';
+import 'mercado_pago_webview_screen.dart';
 import 'app_main_screen.dart';
 
 class PaymentScreen extends StatefulWidget {
@@ -210,7 +211,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       'price': item.precio,
     }).toList();
 
-    final success = await MercadoPagoService.startPaymentProcess(
+    final initPoint = await MercadoPagoService.startPaymentProcess(
       orderId: orderNumber,
       totalAmount: total,
       items: itemsPayload,
@@ -221,19 +222,28 @@ class _PaymentScreenState extends State<PaymentScreen> {
     setState(() => _isProcessing = false);
 
     if (mounted) {
-      if (success) {
-        cart.clearCart();
-        Navigator.pushAndRemoveUntil(
+      if (initPoint != null) {
+        final success = await Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => PaymentSuccessScreen(orderNumber: orderNumber),
+            builder: (_) => MercadoPagoWebviewScreen(initPointUrl: initPoint),
           ),
-          (route) => false,
         );
+        
+        if (success == true) {
+          cart.clearCart();
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (_) => PaymentSuccessScreen(orderNumber: orderNumber),
+            ),
+            (route) => false,
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('No se pudo abrir la pasarela de pago. Por favor, intenta de nuevo.'),
+            content: Text('No se pudo inicializar Mercado Pago. Por favor, intenta de nuevo.'),
             backgroundColor: Colors.redAccent,
           ),
         );
