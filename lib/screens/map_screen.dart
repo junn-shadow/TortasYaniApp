@@ -221,7 +221,7 @@ class _MapScreenState extends State<MapScreen> {
                             final mapsUrl =
                                 "https://maps.google.com/?q=${_selectedLocation!.latitude},${_selectedLocation!.longitude}";
                             
-                            final Distance distance = const Distance();
+                            const distance = Distance();
                             final double meter = distance.as(LengthUnit.Meter, _initialLocation, _selectedLocation!);
                             final double km = meter / 1000.0;
                             

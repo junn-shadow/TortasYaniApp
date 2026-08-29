@@ -221,14 +221,23 @@ class _PaymentScreenState extends State<PaymentScreen> {
     setState(() => _isProcessing = false);
 
     if (mounted) {
-      cart.clearCart();
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (_) => PaymentSuccessScreen(orderNumber: orderNumber),
-        ),
-        (route) => false,
-      );
+      if (success) {
+        cart.clearCart();
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (_) => PaymentSuccessScreen(orderNumber: orderNumber),
+          ),
+          (route) => false,
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No se pudo abrir la pasarela de pago. Por favor, intenta de nuevo.'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
     }
   }
 

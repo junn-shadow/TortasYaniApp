@@ -54,11 +54,15 @@ class AdminOrdersProvider extends ChangeNotifier {
         _orders.clear();
         await _box.clear();
 
-        for (var item in list) {
-          final mapItem = Map<String, dynamic>.from(item);
-          final String id = mapItem['id'] ?? 'ORD-${DateTime.now().millisecondsSinceEpoch}';
-          await _box.put(id, jsonEncode(mapItem));
-          _orders.add(mapItem);
+        if (list.isNotEmpty) {
+          for (var item in list) {
+            final mapItem = Map<String, dynamic>.from(item);
+            final String id = mapItem['id'] ?? 'ORD-${DateTime.now().millisecondsSinceEpoch}';
+            await _box.put(id, jsonEncode(mapItem));
+            _orders.add(mapItem);
+          }
+        } else {
+          _seedMockData();
         }
       }
     } catch (e) {
@@ -105,24 +109,6 @@ class AdminOrdersProvider extends ChangeNotifier {
           {"nombre": "Torta de Zanahoria (L)", "cantidad": 1, "precio": 88.0}
         ],
         "total": 88.0,
-      },
-      {
-        "id": "ORD-1084",
-        "fecha": "2026-08-20 18:45",
-        "cliente": "Sofía Castro",
-        "dniCliente": "45892103",
-        "telefono": "915-234-567",
-        "direccion": "Jirón Huallaga 120, Centro de Lima",
-        "estado": "Pagado",
-        "estadoPago": "Aprobado",
-        "metodoPago": "Tarjeta",
-        "montoAdelanto": 145.0,
-        "saldoPendiente": 0.0,
-        "items": [
-          {"nombre": "Red Velvet (M)", "cantidad": 1, "precio": 90.0},
-          {"nombre": "Pie de Limón (M)", "cantidad": 1, "precio": 55.0}
-        ],
-        "total": 145.0,
       }
     ];
 

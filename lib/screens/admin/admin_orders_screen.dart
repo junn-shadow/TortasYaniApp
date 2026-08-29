@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../providers/admin_orders_provider.dart';
+import '../../services/nubefact_service.dart';
 
 class AdminOrdersScreen extends StatefulWidget {
   const AdminOrdersScreen({super.key});
@@ -109,12 +111,6 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
         return const Color(0xFF6B7280); // Gris medio
     }
   }
-
-  // Emojis según estado - Removidos para diseño sobrio y profesional
-  String _getStatusEmoji(String status) {
-    return "";
-  }
-
   @override
   Widget build(BuildContext context) {
     final adminOrdersProvider = Provider.of<AdminOrdersProvider>(context);
@@ -322,15 +318,19 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                     children: [
                       const Icon(Iconsax.user, color: Color(0xFF1E293B), size: 16),
                       const SizedBox(width: 8),
-                      Text(
-                        order["cliente"],
-                        style: const TextStyle(
-                          color: Color(0xFF0F172A),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                      Expanded(
+                        child: Text(
+                          order["cliente"],
+                          style: const TextStyle(
+                            color: Color(0xFF0F172A),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 12),
                       const Icon(Iconsax.call, color: Color(0xFF64748B), size: 14),
                       const SizedBox(width: 4),
                       Text(
@@ -382,13 +382,18 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              "${item["cantidad"]}x  ${item["nombre"]}",
-                              style: const TextStyle(
-                                color: Color(0xFF0F172A),
-                                fontSize: 13,
+                            Expanded(
+                              child: Text(
+                                "${item["cantidad"]}x  ${item["nombre"]}",
+                                style: const TextStyle(
+                                  color: Color(0xFF0F172A),
+                                  fontSize: 13,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
+                            const SizedBox(width: 12),
                             Text(
                               "S/ ${(item["precio"] * item["cantidad"]).toStringAsFixed(2)}",
                               style: const TextStyle(
@@ -427,7 +432,14 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                           ),
                         ],
                       ),
-                      _buildActionButton(order, provider),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildInvoiceButton(order),
+                          const SizedBox(width: 8),
+                          _buildActionButton(order, provider),
+                        ],
+                      ),
                     ],
                   ),
                 ],
@@ -440,6 +452,62 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
         .animate()
         .fade(duration: 350.ms)
         .slideX(begin: 0.05, duration: 350.ms);
+  }
+
+  // Botón para Emitir Boleta con Nubefact
+  Widget _buildInvoiceButton(Map<String, dynamic> order) {
+    return IconButton(
+      onPressed: () async {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Generando comprobante..."),
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        // Mapear items al formato esperado
+        List<Map<String, dynamic>> productos = (order["items"] as List).map((i) => {
+          "id": i["id"] ?? "1",
+          "nombre": i["nombre"] ?? "Torta",
+          "cantidad": i["cantidad"] ?? 1,
+          "precio_unitario": (i["precio"] as num).toDouble(),
+        }).toList();
+
+        final response = await NubefactService.generarBoleta(
+          clienteDni: "00000000", // Valor por defecto si no hay DNI
+          clienteNombre: order["cliente"] ?? "Cliente",
+          clienteDireccion: order["direccion"] ?? "-",
+          totalPedido: (order["total"] as num).toDouble(),
+          productos: productos,
+        );
+
+        if (response != null && response['enlace_del_pdf'] != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Comprobante generado con éxito"),
+              backgroundColor: Colors.green,
+            ),
+          );
+          final url = Uri.parse(response['enlace_del_pdf']);
+          if (await canLaunchUrl(url)) {
+            await launchUrl(url, mode: LaunchMode.externalApplication);
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Error al generar el comprobante. Revisa tus credenciales."),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+      icon: const Icon(Icons.receipt_long, color: Color(0xFF64748B)),
+      tooltip: "Emitir Boleta",
+      style: IconButton.styleFrom(
+        backgroundColor: const Color(0xFFF1F5F9),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
   }
 
   // Genera el botón adecuado según el estado del pedido

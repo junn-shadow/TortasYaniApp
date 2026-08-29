@@ -18,9 +18,19 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
     try {
       final fetched = await UsersApiService.fetchUsers();
-      _users = fetched;
+      if (fetched.isNotEmpty) {
+        _users = fetched;
+      } else {
+        _users = [
+          User(id: "1", nombre: "Yani Admin", email: "admin@gmail.com", rol: "admin", activo: true),
+          User(id: "2", nombre: "Carla Mendoza", email: "carla@gmail.com", rol: "client", activo: true),
+        ];
+      }
     } catch (e) {
-      // Handle error silently for mock
+      _users = [
+        User(id: "1", nombre: "Yani Admin", email: "admin@gmail.com", rol: "admin", activo: true),
+        User(id: "2", nombre: "Carla Mendoza", email: "carla@gmail.com", rol: "client", activo: true),
+      ];
     } finally {
       _isLoading = false;
       notifyListeners();

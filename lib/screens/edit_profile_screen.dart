@@ -222,16 +222,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  final String _maleAvatar = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=250&q=80';
-  final String _femaleAvatar = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=250&q=80';
-
-  void _selectPresetAvatar(String url) {
-    setState(() {
-      _imageBytes = null;
-      _fotoPerfilBase64 = url;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
