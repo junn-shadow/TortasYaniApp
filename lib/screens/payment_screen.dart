@@ -298,21 +298,27 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   borderRadius: BorderRadius.circular(15),
                 ),
                 padding: const EdgeInsets.all(10),
-                child: Image.asset(
-                  'assets/images/yape_qr.png',
+                child: Image.network(
+                  'https://res.cloudinary.com/ddfzttgyr/image/upload/v1787969150/yapeqr_pbjedi.png',
                   width: 200,
                   height: 200,
                   fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return const SizedBox(
+                      width: 200,
+                      height: 200,
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  },
                   errorBuilder: (context, error, stackTrace) {
                     return const SizedBox(
                       width: 200,
                       height: 200,
                       child: Center(
-                        child: Text(
-                          "Reemplaza la imagen 'yape_qr.png' en assets/images/",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.grey),
-                        ),
+                        child: Icon(Icons.error, color: Colors.red, size: 50),
                       ),
                     );
                   },
