@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'session_service.dart';
 
@@ -19,7 +20,7 @@ class AuthService {
         Uri.parse('$baseUrl/Auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email, 'password': password}),
-      );
+      ).timeout(const Duration(seconds: 45));
       final result = jsonDecode(response.body);
 
       if (result['success'] == true) {
@@ -54,6 +55,11 @@ class AuthService {
         return {'success': true, 'message': 'Inicio de sesión offline/mock concedido'};
       }
       
+      // Manejar explícitamente el timeout
+      if (e is TimeoutException) {
+        return {'success': false, 'message': 'El servidor está tardando mucho en responder (posiblemente se esté encendiendo). Por favor, inténtalo de nuevo en unos segundos.'};
+      }
+      
       return {'success': false, 'message': 'Error de conexión. No se pudo validar las credenciales.'};
     }
   }
@@ -76,7 +82,7 @@ class AuthService {
           'telefono': telefono,
           'direccion': direccion,
         }),
-      );
+      ).timeout(const Duration(seconds: 45));
       final result = jsonDecode(response.body);
 
       if (result['success'] == true) {
