@@ -170,6 +170,28 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
             const SizedBox(height: 14),
 
+            // YAPE QR BUTTON
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton.icon(
+                onPressed: _isProcessing ? null : () => _showYapeQrDialog(context, cart),
+                icon: const Icon(Icons.qr_code, color: Colors.white, size: 22),
+                label: const Text(
+                  "Pagar con Yape (Código QR)",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF720D5D), // Color Yape
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  elevation: 0,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
             SizedBox(
               width: double.infinity,
               height: 56,
@@ -251,7 +273,83 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
-  Future<void> _processPay(BuildContext context, CartProvider cart) async {
+  void _showYapeQrDialog(BuildContext context, CartProvider cart) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text(
+            "Pago con Yape",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF720D5D)),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Escanea el siguiente código para realizar el pago.",
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 15),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade300, width: 2),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                padding: const EdgeInsets.all(10),
+                child: Image.asset(
+                  'assets/images/yape_qr.png',
+                  width: 200,
+                  height: 200,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const SizedBox(
+                      width: 200,
+                      height: 200,
+                      child: Center(
+                        child: Text(
+                          "Reemplaza la imagen 'yape_qr.png' en assets/images/",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 15),
+              const Text(
+                "Una vez realizado el Yapeo, por favor presiona el botón inferior para enviarnos tu constancia por WhatsApp.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, color: Colors.black54),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancelar", style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _processPay(context, cart, isYape: true);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF25D366),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              child: const Text("Ya pagué (WhatsApp)", style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _processPay(BuildContext context, CartProvider cart, {bool isYape = false}) async {
     setState(() => _isProcessing = true);
     await Future.delayed(const Duration(seconds: 1));
     setState(() => _isProcessing = false);
@@ -287,7 +385,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
     mensaje.writeln("💰 *Total a pagar: S/ ${total.toStringAsFixed(0)}*");
     mensaje.writeln();
-    mensaje.writeln("⏳ Por favor confirmar mi pedido y coordinar el pago. ¡Gracias! 🙏");
+    
+    if (isYape) {
+      mensaje.writeln("✅ *Acabo de realizar el pago por Yape (Adjunto la captura/constancia en este chat)*");
+    } else {
+      mensaje.writeln("⏳ Por favor confirmar mi pedido y coordinar el pago. ¡Gracias! 🙏");
+    }
 
     cart.clearCart();
 
